@@ -10,7 +10,7 @@ import tensorflow as tf
 
 from main import Submission, submission_callbacks
 
-TEAM = os.getenv("GITHUB_REPOSITORY", "unknown/unknown").lsplit("/", 1)
+TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-unknown").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "UNKNOWN")
 
 class Timeout(cbks.Callback):
