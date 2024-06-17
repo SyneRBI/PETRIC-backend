@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TODO: extract from env:
+# - team name (from repo name synerbi/petric-<team>)
+
+docker run --rm -it --gpus all --user root \
+  -v /mnt/share:/mnt/share \
+  -v /opt/runner:/o \
+  -v .:/w -w /w \
+  synerbi/sirf:ci \
+  /o/petric-cmd.sh

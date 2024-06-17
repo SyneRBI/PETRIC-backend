@@ -1,0 +1,22 @@
+services:
+  petric:
+    build: .
+    image: synerbi/sirf:ci
+    command: "exit 0"
+  tensorboard:
+    image: synerbi/sirf:ci
+    restart: always
+    command: "tensorboard --logdir=logs --bind_all"
+    volumes: [/opt/runner/logs:/logs]
+    labels:
+      virtual.host: tomography.stfc.ac.uk
+      virtual.port: 6006
+      virtual.tls-email: casper.da-costa-luis@stfc.ac.uk
+    depends_on: [caddy]
+  caddy:
+    image: wemakeservices/caddy-gen
+    restart: always
+    cap_add: [NET_ADMIN]
+    volumes: [./caddy:/data/caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    ports: ["80:80", "443:443", "443:443/udp"]
+    healthcheck: {test: "wget --spider caddy --header 'Host: tomography.stfc.ac.uk'"}
