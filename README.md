@@ -13,8 +13,18 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 - Sources: [`runner`](./runner), [`docker-compose.yml`](./docker-compose.yml)`:petric`
 - Usage: [PETRIC:.github/workflows/run.yml](https://github.com/SyneRBI/PETRIC/blob/main/.github/workflows/run.yml)`:jobs.full`
 
-## TensorBoard server
+## Webserver
+
+### Tensorboard
 
 - Sources: [`docker-compose.yml`](./docker-compose.yml)`:tensorboard`
 - Exposes: `/opt/runner/logs`
-- Result ("leaderboard"): <https://tomography.stfc.ac.uk>
+- Result: <https://tomography.stfc.ac.uk/leaderboard>
+
+### FTP
+
+- Sources: [`docker-compose.yml`](./docker-compose.yml)`:ftp`
+- Exposes: `/mnt/share/petric`
+- Result: <https://tomography.stfc.ac.uk/petric>
+
+Note that anything placed in <http://stfc.cdcl.ml:9999/lab/tree/share/petric> will be served publicly at the URL above.
