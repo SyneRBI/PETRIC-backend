@@ -3,20 +3,29 @@ services:
     build: .
     image: synerbi/sirf:ci
     command: "exit 0"
+  ftp:
+    image: python:3-slim
+    restart: always
+    expose: [8000]
+    command: "python -m http.server -d /share" # subdir `/petric` defined in global.caddy
+    volumes: [/mnt/share:/share]
+    healthcheck:
+      test: >
+        python -c 'import http.client;
+        c=http.client.HTTPConnection("localhost", 8000);
+        c.request("HEAD", "/petric");
+        c.getresponse().status == 200'
   tensorboard:
     image: synerbi/sirf:ci
     restart: always
-    command: "tensorboard --logdir=logs --bind_all"
+    expose: [6006]
+    command: "tensorboard --logdir=logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix=/leaderboard"
     volumes: [/opt/runner/logs:/logs]
-    labels:
-      virtual.host: tomography.stfc.ac.uk
-      virtual.port: 6006
-      virtual.tls-email: casper.da-costa-luis@stfc.ac.uk
-    depends_on: [caddy]
+    healthcheck: {test: "wget --spider localhost:6006/leaderboard"}
   caddy:
     image: wemakeservices/caddy-gen
     restart: always
     cap_add: [NET_ADMIN]
-    volumes: [./caddy:/data/caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    volumes: [./caddy:/data/caddy, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    environment: {CADDY_SNIPPET: /global.caddy}
     ports: ["80:80", "443:443", "443:443/udp"]
-    healthcheck: {test: "wget --spider caddy --header 'Host: tomography.stfc.ac.uk'"}
