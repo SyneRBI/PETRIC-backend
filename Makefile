@@ -10,4 +10,4 @@ build:
 	docker compose build petric
 up:
 	echo serving website
-	docker compose up -d caddy ftp tensorboard
+	docker compose up -d caddy ftp leaderboard

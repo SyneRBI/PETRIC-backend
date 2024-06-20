@@ -15,7 +15,7 @@ services:
         c=http.client.HTTPConnection("localhost", 8000);
         c.request("HEAD", "/petric");
         c.getresponse().status == 200'
-  tensorboard:
+  leaderboard:
     image: synerbi/sirf:ci
     restart: always
     expose: [6006]

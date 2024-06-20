@@ -17,9 +17,9 @@ Note that [`runner/petric-full.py`](./runner/petric-full.py) runs `main.Submissi
 
 ## Webserver
 
-### Tensorboard
+### Leaderboard
 
-- Sources: [`docker-compose.yml`](./docker-compose.yml)`:tensorboard`
+- Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard`
 - Exposes: `/opt/runner/logs`
 - Result: <https://tomography.stfc.ac.uk/leaderboard>
 

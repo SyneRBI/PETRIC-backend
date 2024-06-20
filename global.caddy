@@ -1,7 +1,7 @@
 tomography.stfc.ac.uk {
   tls casper.da-costa-luis@stfc.ac.uk
   reverse_proxy /leaderboard* {
-    to tensorboard:6006
+    to leaderboard:6006
   }
   reverse_proxy /petric* {
     to ftp:8000
