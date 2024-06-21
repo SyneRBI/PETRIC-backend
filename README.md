@@ -10,10 +10,11 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 
 - Runner: [`synerbi@stfc`](https://github.com/organizations/SyneRBI/settings/actions/runners/102)
   + Tags: `docker`, `cuda`
-- Sources: [`runner`](./runner), [`docker-compose.yml`](./docker-compose.yml)`:petric`
+- Sources: [`runner`](./runner), [`docker-compose.yml`](./docker-compose.yml)`:petric`, [`Dockerfile`](./Dockerfile)
 - Usage: [PETRIC:.github/workflows/run.yml](https://github.com/SyneRBI/PETRIC/blob/main/.github/workflows/run.yml)`:jobs.full`
 
-Note that [`runner/petric-full.py`](./runner/petric-full.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
+> [!TIP]
+> [`runner/petric-full.py`](./runner/petric-full.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
 
 ## Webserver
 
