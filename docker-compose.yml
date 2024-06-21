@@ -28,6 +28,7 @@ services:
             pass_thru
           }
         }
+        redir / https://github.com/SyneRBI/PETRIC
   caddy:
     image: casperdcl/caddy-gen
     restart: always
