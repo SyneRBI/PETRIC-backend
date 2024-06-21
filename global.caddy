@@ -1,11 +1,7 @@
 tomography.stfc.ac.uk {
   tls casper.da-costa-luis@stfc.ac.uk
-  reverse_proxy /leaderboard* {
-    to leaderboard:6006
-  }
-  reverse_proxy /petric* {
-    to ftp:8000
-  }
+  redir /leaderboard* https://petric.tomography.stfc.ac.uk{uri} permanent
+  redir /petric* https://petric.tomography.stfc.ac.uk/data permanent
   encode zstd gzip
   log {
     output stdout

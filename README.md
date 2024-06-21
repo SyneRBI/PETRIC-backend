@@ -21,12 +21,18 @@ Note that [`runner/petric-full.py`](./runner/petric-full.py) runs `main.Submissi
 
 - Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard`
 - Exposes: `/opt/runner/logs`
-- Result: <https://tomography.stfc.ac.uk/leaderboard>
+- Result: <https://petric.tomography.stfc.ac.uk/leaderboard>
 
-### FTP
+### Files
 
-- Sources: [`docker-compose.yml`](./docker-compose.yml)`:ftp`
+- Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard.labels.virtual.host.directives,caddy.volumes`
 - Exposes: `/mnt/share/petric`
-- Result: <https://tomography.stfc.ac.uk/petric>
+- Result: <https://petric.tomography.stfc.ac.uk/data>
 
-Note that anything placed in <http://stfc.cdcl.ml:9999/lab/tree/share/petric> will be served publicly at the URL above.
+> [!TIP]
+> Anything placed in <http://stfc.cdcl.ml:9999/lab/tree/share/petric> will be served publicly at the URL above.
+
+<!-- -->
+
+> [!NOTE]
+> Relative symlinks are only supported 1 level up (i.e. `/mnt/share/petric/X -> ../X -> /mnt/share/X`)
