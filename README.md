@@ -14,7 +14,7 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 - Usage: [PETRIC:.github/workflows/run.yml](https://github.com/SyneRBI/PETRIC/blob/main/.github/workflows/run.yml)`:jobs.full`
 
 > [!TIP]
-> [`runner/petric-full.py`](./runner/petric-full.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
+> [`petric.py`](https://github.com/SyneRBI/PETRIC/blob/main/petric.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
 
 ## Webserver
 

@@ -29,7 +29,7 @@ pushd "${SB_PATH}"
 test -x ./INSTALL/bin/gadgetron && ./INSTALL/bin/gadgetron >& ~/gadgetron.log&
 popd
 
-python /o/petric-full.py
+curl -fsSL https://raw.githubusercontent.com/SyneRBI/PETRIC/main/petric.py | python
 
 echo "stopping jobs"
 for i in $(jobs -p); do kill -n 15 $i; done 2>/dev/null
