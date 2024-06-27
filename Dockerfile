@@ -1,2 +1,2 @@
-FROM synerbi/sirf:latest-gpu
-RUN conda install -y tensorflow tensorboard
+FROM synerbi/sirf:edge-gpu
+RUN conda install -y tensorboard tensorboardx jupytext
