@@ -5,6 +5,7 @@ install:
 	sudo cp runner/petric* /opt/runner/
 	sudo chown root:runner /opt/runner/petric*
 	sudo chmod go-w /opt/runner/petric*
+	sudo chmod a+rx /opt/runner/petric*
 build:
 	echo building CI image
 	docker compose build --pull petric

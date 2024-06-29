@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO: extract from env:
-# - team name (from repo name synerbi/petric-<team>)
-
-docker run --rm -it --gpus all --user root \
-  -v /mnt/share:/mnt/share \
-  -v /opt/runner:/o \
-  -v .:/w -w /w \
+chgrp -R $GROUPS .
+chmod -R g+w .
+docker run --rm --gpus all --user root --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
+  -e RUNNER_GID=$GROUPS \
+  -v /mnt/share:/mnt/share:ro \
+  -v /opt/runner:/o:rw \
+  -v .:/w:rw -w /w \
   synerbi/sirf:ci \
   /o/petric-cmd.sh
