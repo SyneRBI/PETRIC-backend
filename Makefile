@@ -7,7 +7,7 @@ install:
 	sudo chmod go-w /opt/runner/petric*
 build:
 	echo building CI image
-	docker compose build petric
+	docker compose build --pull petric
 up:
 	echo serving website
 	docker compose up -d caddy leaderboard
