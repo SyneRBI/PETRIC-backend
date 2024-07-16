@@ -8,6 +8,7 @@ install:
 	sudo chmod a+rx /opt/runner/petric*
 build:
 	echo building CI image
+	docker pull synerbi/sirf:edge-gpu
 	docker compose build --pull petric
 up:
 	echo serving website
