@@ -27,7 +27,8 @@ source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
 set -u
 
 if test -f environment.yml; then
-  conda install --file environment.yml
+  sed -i '/^name:.*/d' environment.yml
+  conda env update -n base
 fi
 if test -f requirements.txt; then
   pip install -r requirements.txt
