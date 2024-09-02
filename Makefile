@@ -10,6 +10,9 @@ build:
 	echo building CI image
 	docker pull synerbi/sirf:edge-gpu
 	docker compose build --pull petric
-up:
+up: /opt/runner/logs/0_THRESHOLDS
 	echo serving website
 	docker compose up -d caddy leaderboard
+/opt/runner/logs/0_THRESHOLDS: runner/thresholds.py build
+	sudo rm -rf $@
+	docker run --rm --user root -v .:/w -w /w -v /mnt/share:/mnt/share:ro -v /opt/runner:/o:rw synerbi/sirf:ci python $<

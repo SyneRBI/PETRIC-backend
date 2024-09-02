@@ -16,6 +16,11 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 > [!TIP]
 > [`petric.py`](https://github.com/SyneRBI/PETRIC/blob/main/petric.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
 
+<!-- <br/> -->
+
+> [!NOTE]
+> [`thresholds.py`](./runner/thresholds.py) writes tensorboard logs to `/opt/runner/logs/0_THRESHOLDS`.
+
 ## Webserver
 
 ### Leaderboard
@@ -33,7 +38,7 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 > [!TIP]
 > Anything placed in <http://stfc.cdcl.ml:9999/lab/tree/share/petric> will be served publicly at the URL above.
 
-<!-- -->
+<!-- <br/> -->
 
 > [!NOTE]
 > Relative symlinks are only supported 1 level up (i.e. `/mnt/share/petric/X -> ../X -> /mnt/share/X`)
