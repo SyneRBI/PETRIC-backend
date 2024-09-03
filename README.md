@@ -32,11 +32,17 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 ### Files
 
 - Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard.labels.virtual.host.directives,caddy.volumes`
-- Exposes: `/mnt/share/petric`
-- Result: <https://petric.tomography.stfc.ac.uk/data>
+- Exposes: `/mnt/share/petric`, `/mnt/share/petric-wip`
+- Result: <https://petric.tomography.stfc.ac.uk/data>, [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
 
 > [!TIP]
-> Anything placed in <http://stfc.cdcl.ml:9999/lab/tree/share/petric> will be served publicly at the URL above.
+> [/data](https://petric.tomography.stfc.ac.uk/data)
+> - web browser: read-only
+> - [NAS on windows](https://support.microsoft.com/en-us/windows/map-a-network-drive-in-windows-29ce55d1-34e3-a7e2-4801-131475f9557d) or [DavFS on linux](https://askubuntu.com/questions/498526/mounting-a-webdav-share-by-users): writable with authentication
+>
+> [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
+> - web browser: read-only with authentication
+> - NAS/DavFS: writable with authentication
 
 <!-- <br/> -->
 
