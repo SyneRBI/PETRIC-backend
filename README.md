@@ -1,6 +1,6 @@
 # PETRIC Backend
 
-Internal support for https://github.com/SyneRBI/PETRIC
+Internal support for [SyneRBI/PETRIC](https://github.com/SyneRBI/PETRIC).
 
 The machine `tomography.stfc.ac.uk` runs two separate (technically independent) things I couldn't be bothered to put into different repos.
 
@@ -19,7 +19,7 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 <!-- <br/> -->
 
 > [!NOTE]
-> [`thresholds.py`](./runner/thresholds.py) writes tensorboard logs to `/opt/runner/logs/0_THRESHOLDS`.
+> [`thresholds.py`](./runner/thresholds.py) generates hardcoded tensorboard logs in `/opt/runner/logs/0_THRESHOLDS`.
 
 ## Webserver
 
