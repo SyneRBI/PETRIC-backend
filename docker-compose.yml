@@ -26,6 +26,19 @@ services:
             import sirf_auth
             webdav
           }
+          # render markdown
+          @mdfile path_regexp /.+\.md$
+          handle @mdfile {
+            header Content-Type text/html
+            templates
+            respond <<HTML
+            <!DOCTYPE html>
+            <html><head><title>{{base .Req.URL.Path}}</title></head>
+            <body><a href=".">{{dir .Req.URL.Path}}/</a>{{base .Req.URL.Path}}<hr/>
+            {{readFile .Req.URL.Path | markdown}}
+            </body></html>
+            HTML 200
+          }
           import filesrv
         }
         handle_path /data-wip* {
