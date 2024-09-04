@@ -23,32 +23,18 @@ services:
         handle_path /data* {
           root * /share/petric
           route @notget {
-            basic_auth {
-              sirf $2a$14$$rpRTWRijdH41OrZeZvbvBunD4mkXapj3tN1qDc1sqIlTYjK1jOWaC
-            }
+            import sirf_auth
             webdav
           }
-          file_server {
-            browse {
-              reveal_symlinks
-            }
-            pass_thru
-          }
+          import filesrv
         }
         handle_path /data-wip* {
           root * /share/petric-wip
-          basic_auth {
-            sirf $2a$14$$rpRTWRijdH41OrZeZvbvBunD4mkXapj3tN1qDc1sqIlTYjK1jOWaC
-          }
+          import sirf_auth
           route @notget {
             webdav
           }
-          file_server {
-            browse {
-              reveal_symlinks
-            }
-            pass_thru
-          }
+          import filesrv
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
   caddy:
