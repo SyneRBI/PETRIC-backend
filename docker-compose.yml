@@ -18,12 +18,14 @@ services:
       virtual.port: 6006
       virtual.proxy.matcher: /leaderboard*
       # /data -> caddy:/share/petric
+      # /data-wip -> caddy:/share/petric-wip
+      # / -> wiki
       virtual.host.directives: |
         @notget not method GET
         handle_path /data* {
           root * /share/petric
           route @notget {
-            import sirf_auth
+            # import sirf_auth # no need as docker mounted as read-only
             webdav
           }
           # render markdown
@@ -55,7 +57,7 @@ services:
     build: {context: ., target: caddy-gen}
     restart: always
     cap_add: [NET_ADMIN]
-    volumes: [./caddy:/data/caddy, /mnt/share:/share, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    volumes: [./caddy:/data/caddy, /mnt/share:/share, /mnt/share/petric:/share/petric:ro, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
     environment: {CADDY_SNIPPET: /global.caddy}
     ports: ["80:80", "443:443", "443:443/udp"]
     healthcheck: {test: "wget --spider localhost/data --header Host:petric.tomography.stfc.ac.uk"}

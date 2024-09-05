@@ -37,12 +37,12 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 
 > [!TIP]
 > [/data](https://petric.tomography.stfc.ac.uk/data)
-> - web browser: read-only
-> - [NAS on windows](https://support.microsoft.com/en-us/windows/map-a-network-drive-in-windows-29ce55d1-34e3-a7e2-4801-131475f9557d) or [DavFS on linux](https://askubuntu.com/questions/498526/mounting-a-webdav-share-by-users): writable with authentication
+> - accessible via web browser, [NAS on windows](https://support.microsoft.com/en-us/windows/map-a-network-drive-in-windows-29ce55d1-34e3-a7e2-4801-131475f9557d), or [DavFS on linux](https://askubuntu.com/questions/498526/mounting-a-webdav-share-by-users)
+> - some files render nicely in-browser (e.g. `md`, `mp4`, `png`)
 >
 > [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
-> - web browser: read-only with authentication
-> - NAS/DavFS: writable with authentication
+> - needs authentication (username & password)
+> - writable when mounted as NAS/DavFS
 
 <!-- <br/> -->
 
