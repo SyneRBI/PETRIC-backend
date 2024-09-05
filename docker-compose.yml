@@ -18,7 +18,7 @@ services:
       virtual.port: 6006
       virtual.proxy.matcher: /leaderboard*
       # /data -> caddy:/share/petric
-      # /data-wip -> caddy:/share/petric-wip
+      # /data-wip -> caddy:/share-rw/petric-wip
       # / -> wiki
       virtual.host.directives: |
         @notget not method GET
@@ -28,28 +28,15 @@ services:
             # import sirf_auth # no need as docker mounted as read-only
             webdav
           }
-          # render markdown
-          @mdfile path_regexp /.+\.md$
-          handle @mdfile {
-            header Content-Type text/html
-            templates
-            respond <<HTML
-            <!DOCTYPE html>
-            <html><head><title>{{base .Req.URL.Path}}</title></head>
-            <body><a href=".">{{dir .Req.URL.Path}}/</a>{{base .Req.URL.Path}}<hr/>
-            {{readFile .Req.URL.Path | markdown}}
-            </body></html>
-            HTML 200
-          }
-          import filesrv
+          import filesrv "" # read-only so fine to map md to html
         }
         handle_path /data-wip* {
-          root * /share/petric-wip
+          root * /share-rw/petric-wip
           import sirf_auth
           route @notget {
             webdav
           }
-          import filesrv
+          import filesrv html # writable so must request *.mdhtml extension explicitly
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
   caddy:
@@ -57,7 +44,7 @@ services:
     build: {context: ., target: caddy-gen}
     restart: always
     cap_add: [NET_ADMIN]
-    volumes: [./caddy:/data/caddy, /mnt/share:/share, /mnt/share/petric:/share/petric:ro, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    volumes: [./caddy:/data/caddy, /mnt/share:/share-rw, /mnt/share:/share:ro, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
     environment: {CADDY_SNIPPET: /global.caddy}
     ports: ["80:80", "443:443", "443:443/udp"]
     healthcheck: {test: "wget --spider localhost/data --header Host:petric.tomography.stfc.ac.uk"}

@@ -1,4 +1,19 @@
 (filesrv) {
+  # arguments: <markdown file extension post-suffix>
+  @mdhtml path_regexp /(.+\.md){args[0]}$
+  handle @mdhtml {
+    header Content-Type text/html
+    templates {
+      between "<<" ">>"
+    }
+    respond <<HTML
+    <!DOCTYPE html>
+    <html><head><title><<placeholder "http.regexp.mdhtml.1" | base>></title></head>
+    <body><a href="."><<placeholder "http.regexp.mdhtml.1" | dir>>/</a><<placeholder "http.regexp.mdhtml.1" | base>><hr/>
+    <<placeholder "http.regexp.mdhtml.1" | readFile | markdown>>
+    </body></html>
+    HTML 200
+  }
   file_server {
     browse {
       reveal_symlinks
@@ -16,6 +31,15 @@ tomography.stfc.ac.uk {
   tls casper.da-costa-luis@stfc.ac.uk
   redir /leaderboard* https://petric.tomography.stfc.ac.uk{uri} permanent
   redir /petric* https://petric.tomography.stfc.ac.uk/data permanent
+  @notget not method GET
+  handle /* {
+    root * /share/stfc.ac.uk/tomography
+    route @notget {
+      # import cil_auth # not needed as docker mounted read-only
+      webdav
+    }
+    import filesrv "" # read-only so fine to map md to html
+  }
   encode zstd gzip
   log {
     output stdout
