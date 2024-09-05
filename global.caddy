@@ -8,7 +8,7 @@
 }
 (sirf_auth) {
   basic_auth {
-    sirf $2a$14$$rpRTWRijdH41OrZeZvbvBunD4mkXapj3tN1qDc1sqIlTYjK1jOWaC
+    sirf $2a$14$rpRTWRijdH41OrZeZvbvBunD4mkXapj3tN1qDc1sqIlTYjK1jOWaC
     cil $2a$14$4tJTVp1FvXtVew493tOZheuXkfVCDYs9rMPyhQ6/QPPwSNSntTpdq
   }
 }
