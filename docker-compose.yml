@@ -25,14 +25,14 @@ services:
         handle_path /data* {
           root * /share/petric
           route @notget {
-            # import sirf_auth # no need as docker mounted as read-only
+            # import ext_auth # no need as docker mounted as read-only
             webdav
           }
           import filesrv "" # read-only so fine to map md to html
         }
         handle_path /data-wip* {
           root * /share-rw/petric-wip
-          import sirf_auth
+          import ext_auth
           route @notget {
             webdav
           }
@@ -44,7 +44,13 @@ services:
     build: {context: ., target: caddy-gen}
     restart: always
     cap_add: [NET_ADMIN]
-    volumes: [./caddy:/data/caddy, /mnt/share:/share-rw, /mnt/share:/share:ro, ./global.caddy:/global.caddy, /var/run/docker.sock:/tmp/docker.sock:ro]
+    volumes:
+    - ./caddy:/data/caddy
+    - /mnt/share:/share-rw
+    - /mnt/share:/share:ro
+    - /mnt/share-private:/share-private:ro
+    - ./global.caddy:/global.caddy
+    - /var/run/docker.sock:/tmp/docker.sock:ro
     environment: {CADDY_SNIPPET: /global.caddy}
     ports: ["80:80", "443:443", "443:443/udp"]
     healthcheck: {test: "wget --spider localhost/data --header Host:petric.tomography.stfc.ac.uk"}

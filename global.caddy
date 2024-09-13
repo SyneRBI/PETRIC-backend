@@ -21,7 +21,7 @@
     pass_thru
   }
 }
-(sirf_auth) {
+(ext_auth) {
   basic_auth {
     sirf $2a$14$rpRTWRijdH41OrZeZvbvBunD4mkXapj3tN1qDc1sqIlTYjK1jOWaC
     cil $2a$14$4tJTVp1FvXtVew493tOZheuXkfVCDYs9rMPyhQ6/QPPwSNSntTpdq
@@ -33,7 +33,7 @@ tomography.stfc.ac.uk {
   redir /petric* https://petric.tomography.stfc.ac.uk/data permanent
   @notget not method GET
   handle /* {
-    root * /share/stfc.ac.uk/tomography
+    root * /share-private/stfc.ac.uk/tomography
     route @notget {
       # import cil_auth # not needed as docker mounted read-only
       webdav
