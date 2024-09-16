@@ -27,11 +27,19 @@
     cil $2a$14$4tJTVp1FvXtVew493tOZheuXkfVCDYs9rMPyhQ6/QPPwSNSntTpdq
   }
 }
-tomography.stfc.ac.uk {
+(common) {
   tls casper.da-costa-luis@stfc.ac.uk
+  @notget not method GET
+  @get method GET
+  encode zstd gzip
+  log {
+    output stdout
+  }
+}
+tomography.stfc.ac.uk {
+  import common
   redir /leaderboard* https://petric.tomography.stfc.ac.uk{uri} permanent
   redir /petric* https://petric.tomography.stfc.ac.uk/data permanent
-  @notget not method GET
   handle /* {
     root * /share-private/stfc.ac.uk/tomography
     route @notget {
@@ -39,9 +47,5 @@ tomography.stfc.ac.uk {
       webdav
     }
     import filesrv "" # read-only so fine to map md to html
-  }
-  encode zstd gzip
-  log {
-    output stdout
   }
 }
