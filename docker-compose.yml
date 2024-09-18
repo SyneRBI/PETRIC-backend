@@ -4,7 +4,7 @@ services:
     image: synerbi/sirf:ci
     command: "exit 0"
   leaderboard:
-    image: synerbi/sirf:ci
+    build: {context: ., target: leaderboard}
     restart: always
     expose: [6006]
     command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /leaderboard"
