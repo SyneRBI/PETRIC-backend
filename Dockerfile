@@ -1,6 +1,6 @@
 # FROM synerbi/sirf:edge-gpu AS sirf
-# pin to https://github.com/SyneRBI/SIRF-SuperBuild/commit/7b9f703506a652e061e27b8d9b240bd4076e376b
-FROM ghcr.io/synerbi/sirf@sha256:a5b000a7a836bdbea06a19bf3acd367e6e2a71401ac7ac8d567b2c6f7c2b4efb AS sirf
+# pin to https://github.com/SyneRBI/SIRF-SuperBuild/commit/5f1a7f498bf6f41551c19eb53798b5d33af43eec
+FROM ghcr.io/synerbi/sirf@sha256:2ef963a861bf18346da511d80c3a15eb7f154131224367a2c66578101602c6e0 AS sirf
 RUN conda install -y monai tensorboard tensorboardx jupytext
 RUN pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
 
