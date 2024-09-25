@@ -2,7 +2,14 @@ services:
   petric:
     build: {context: ., target: sirf}
     image: synerbi/sirf:ci
-    command: "exit 0"
+    # quick test of installed libraries
+    deploy: {resources: {reservations: {devices: [{driver: nvidia, count: all, capabilities: [gpu]}]}}}
+    command:
+    - python
+    - -c
+    - |
+       import torch, tensorflow as tf
+       print("torch:", torch.cuda.is_available(), "| tf:", tf.config.list_physical_devices("GPU"))
   leaderboard:
     build: {context: ., target: leaderboard}
     restart: always
