@@ -11,4 +11,4 @@ docker run --rm --gpus all --user root --no-healthcheck -e GITHUB_REPOSITORY -e 
   -v /opt/runner:/o:rw \
   -v .:/w:rw -w /w \
   synerbi/sirf:ci \
-  /o/petric-cmd.sh
+  /o/petric-main.sh
