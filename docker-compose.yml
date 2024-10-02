@@ -15,7 +15,7 @@ services:
     restart: always
     expose: [6006]
     command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /leaderboard"
-    volumes: [/opt/runner/logs:/logs]
+    volumes: ["/opt/runner/logs:/logs"]
     healthcheck: {test: "wget --spider localhost:6006/leaderboard"}
     depends_on: [caddy]
     labels:
