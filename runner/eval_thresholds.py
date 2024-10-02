@@ -42,14 +42,14 @@ def pass_time(tensorboard_logfile: str) -> float:
         QualityMetrics.THRESHOLD["RMSE_whole_object"],
         QualityMetrics.THRESHOLD["RMSE_background"],
     ] + [QualityMetrics.THRESHOLD["AEM_VOI"]] * len(tags)
-    metrics += list(tags.values())
+    metrics.extend(tags.values())
+    metrics = np.array(metrics).T # [(value, time), step, (RMSE, RMSE, VOI, ...)]
 
-    metrics = np.array(zip(*metrics))
     try:
-        i = QualityMetrics.pass_index(metrics[:,0], thresholds)
+        i = QualityMetrics.pass_index(metrics[0], thresholds)
     except IndexError:
         return np.inf
-    return metrics[i][1] - (start or metrics[0][1])
+    return metrics[1][i] - (start or metrics[1][0])
 
 if __name__ == '__main__':
     timings = defaultdict(list) # {"dataset.name": [(time: float, "algo"), ...], ...}
