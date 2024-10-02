@@ -19,3 +19,5 @@ up: /opt/runner/logs/0_THRESHOLDS
 /opt/runner/logs/0_THRESHOLDS: runner/thresholds.py
 	sudo rm -rf $@
 	docker run --rm --user root -e GITHUB_REPOSITORY=SyneRBI/PETRIC-None -e GITHUB_REF_NAME=None -e RUNNER_GID=$(shell id -g) -v ./runner:/w -w /w -v /mnt/share:/mnt/share:ro -v /opt/runner:/o:rw synerbi/sirf:ci ./thresholds.sh
+eval:
+	docker run --rm --user root -e GITHUB_REPOSITORY=SyneRBI/PETRIC-None -e GITHUB_REF_NAME=None -e RUNNER_GID=$(shell id -g) -v ./runner:/w -w /w -v /opt/runner:/o:ro synerbi/sirf:ci ./eval_thresholds.sh
