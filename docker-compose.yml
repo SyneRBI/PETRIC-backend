@@ -47,8 +47,7 @@ services:
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
   caddy:
-    image: casperdcl/caddy-gen:latest
-    build: {context: ., target: caddy-gen}
+    build: {context: ., target: caddy-gen, args: {CADDY_UID: 1000, CADDY_GID: 998}}  # user "ubuntu:docker"
     restart: always
     cap_add: [NET_ADMIN]
     volumes:
