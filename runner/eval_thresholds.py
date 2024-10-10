@@ -92,8 +92,7 @@ if __name__ == '__main__':
     ranks: dict[str, int] = defaultdict(int)
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
-        print(dataset_name)
-        print("=" * len(dataset_name))
+        print("##", dataset_name)
         N = len(time_algos)
         rank = 1
         for t, algo_name in time_algos:
@@ -102,11 +101,10 @@ if __name__ == '__main__':
             else:
                 _rank = rank
                 rank += 1
-            print(f"{_rank}: {algo_name}")
+            print(f"- {_rank}: {algo_name}")
             ranks[algo_name] += _rank
         print("\n")
 
-    print("Leaderboard")
-    print("===========")
+    print("## Leaderboard")
     for algo_name, _ in sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]):
-        print(algo_name)
+        print("-", algo_name)
