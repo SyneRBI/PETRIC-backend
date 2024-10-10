@@ -75,8 +75,9 @@ if __name__ == '__main__':
                     if not valid(logfile):
                         log.warning("rm %s", logfile)
                         # logfile.unlink()
-                t = np.median([
-                    pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)])
+                times = [
+                    pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
+                t = np.median(times) if times else np.inf
                 timings[dataset.name].append((t, f"{team.name}/{algo.name}"))
 
     # insert `time=np.inf` for each team's missing algos
