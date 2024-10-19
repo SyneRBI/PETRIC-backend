@@ -22,6 +22,6 @@ FROM wemakeservices/caddy-gen:1.0.0 AS caddy-gen
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ARG CADDY_UID=0
 ARG CADDY_GID=0
-RUN chown -R $CADDY_UID:$CADDY_GID /code/docker-gen/templates/Caddyfile.tmpl /etc/caddy
+RUN chown -R $CADDY_UID:$CADDY_GID /code/docker-gen/templates/Caddyfile.tmpl /etc/caddy /config/caddy
 RUN chmod a+x /usr/bin/forego
 USER $CADDY_UID:$CADDY_GID
