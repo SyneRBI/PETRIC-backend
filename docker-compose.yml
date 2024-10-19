@@ -28,22 +28,12 @@ services:
       # /data-wip -> caddy:/share-rw/petric-wip
       # / -> wiki
       virtual.host.directives: |
-        @notget not method GET
-        handle_path /data* {
-          root * /share/petric
-          route @notget {
-            # import ext_auth # no need as docker mounted as read-only
-            webdav
-          }
-          import filesrv "" # read-only so fine to map md to html
+        handle /data* {
+          reverse_proxy http://data
         }
-        handle_path /data-wip* {
-          root * /share-rw/petric-wip
+        handle /data-wip* {
           import ext_auth
-          route @notget {
-            webdav
-          }
-          import filesrv html # writable so must request *.mdhtml extension explicitly
+          reverse_proxy http://data-wip
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
   caddy:
@@ -59,4 +49,15 @@ services:
     - /var/run/docker.sock:/tmp/docker.sock:ro
     environment: {CADDY_SNIPPET: /global.caddy}
     ports: ["80:80", "443:443", "443:443/udp"]
-    healthcheck: {test: "wget --spider localhost/data --header Host:petric.tomography.stfc.ac.uk"}
+  data:
+    image: filebrowser/filebrowser:latest
+    restart: always
+    volumes: ["/mnt/share/petric:/srv:ro", "./filebrowser/petric.db:/database.db"]
+    user: "1005:1005"
+    command: [--noauth, -d=/database.db, -b=/data, -l=stdout]
+  data-wip:
+    image: filebrowser/filebrowser:latest
+    restart: always
+    volumes: ["/mnt/share/petric-wip:/srv", "./filebrowser/petric-wip.db:/database.db"]
+    user: "1005:1005"
+    command: [--noauth, -d=/database.db, -b=/data-wip, -l=stdout]

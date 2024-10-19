@@ -31,20 +31,9 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 
 ### Files
 
-- Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard.labels.virtual.host.directives,caddy.volumes`
+- Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard.labels.virtual.host.directives,data,data-wip`
 - Exposes: `/mnt/share/petric`, `/mnt/share/petric-wip`
 - Result: <https://petric.tomography.stfc.ac.uk/data>, [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
 
 > [!TIP]
-> [/data](https://petric.tomography.stfc.ac.uk/data)
-> - accessible via web browser, [NAS on windows](https://support.microsoft.com/en-us/windows/map-a-network-drive-in-windows-29ce55d1-34e3-a7e2-4801-131475f9557d), or [DavFS on linux](https://askubuntu.com/questions/498526/mounting-a-webdav-share-by-users)
-> - some files render nicely in-browser (e.g. `md`, `mp4`, `png`)
->
-> [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
-> - needs authentication (username & password)
-> - writable when mounted as NAS/DavFS
-
-<!-- <br/> -->
-
-> [!NOTE]
-> Relative symlinks are only supported 1 level up (i.e. `/mnt/share/petric/X -> ../X -> /mnt/share/X`)
+> [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip) needs authentication (username & password)
