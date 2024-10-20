@@ -5,6 +5,7 @@ from pathlib import Path, PurePath
 
 import numpy as np
 from tensorboard.backend.event_processing.event_accumulator import SCALARS, EventAccumulator
+from tqdm import tqdm
 
 from petric import QualityMetrics
 
@@ -28,7 +29,7 @@ def valid(tensorboard_logfile: PurePath) -> bool:
     return len({"RMSE_whole_object", "RMSE_background"}.intersection(ea.Tags()['scalars'])) == 2
 
 
-def pass_time(tensorboard_logfile: PurePath, default=2 * 60 * 60) -> float:
+def pass_time(tensorboard_logfile: PurePath) -> float:
     """time at which thresholds were met (minus any metrics calculation time offset)"""
     ea = EventAccumulator(str(tensorboard_logfile), size_guidance={SCALARS: 0})
     ea.Reload()
@@ -56,8 +57,8 @@ def pass_time(tensorboard_logfile: PurePath, default=2 * 60 * 60) -> float:
     try:
         i = QualityMetrics.pass_index(metrics[0], thresholds)
     except IndexError:
-        # add distance away from threshold to default time
-        return default + (metrics[0, -1] - thresholds).sum()
+        # add distance away from threshold to an arbitrarily large constant
+        return 1e5 + (metrics[0, -1] - thresholds).mean()
     return metrics[1, i] - (start or metrics[1, 0])
 
 
@@ -101,7 +102,8 @@ if __name__ == '__main__':
             else:
                 _rank = rank
                 rank += 1
-            print(f"- {_rank}: {algo_name}")
+            print(f"- {_rank}: {algo_name}",
+                  f"({tqdm.format_interval(t)})" if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
             ranks[algo_name] += _rank
         print("")
 
