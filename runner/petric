@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-chgrp -R $GROUPS .
-chmod -R g+w .
+chgrp -Rc $GROUPS .
+chmod -Rc g+w .
 docker run --rm --gpus all --user root --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
   -e TQDM_MININTERVAL=1 \
   -e NUMEXPR_MAX_THREADS=24 \
