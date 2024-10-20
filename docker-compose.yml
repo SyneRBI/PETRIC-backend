@@ -11,13 +11,13 @@ services:
        import torch, tensorflow as tf
        print("torch:", torch.cuda.is_available(), "| tf:", tf.config.list_physical_devices("GPU"))
   leaderboard:
+    networks: [reverse_proxy]
     build: {context: ., target: leaderboard}
     restart: always
     expose: [6006]
     command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /leaderboard"
     volumes: ["/opt/runner/logs:/logs"]
     healthcheck: {test: "wget --spider localhost:6006/leaderboard"}
-    depends_on: [caddy]
     labels:
       virtual.host: petric.tomography.stfc.ac.uk
       virtual.tls-email: casper.da-costa-luis@stfc.ac.uk
@@ -36,28 +36,18 @@ services:
           reverse_proxy http://data-wip
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
-  caddy:
-    build: {context: ., target: caddy-gen, args: {CADDY_UID: 1000, CADDY_GID: 998}}  # user "ubuntu:docker"
-    restart: always
-    cap_add: [NET_ADMIN]
-    volumes:
-    - ./caddy:/data/caddy
-    - /mnt/share:/share-rw
-    - /mnt/share:/share:ro
-    - /mnt/share-private:/share-private:ro
-    - ./global.caddy:/global.caddy
-    - /var/run/docker.sock:/tmp/docker.sock:ro
-    environment: {CADDY_SNIPPET: /global.caddy}
-    ports: ["80:80", "443:443", "443:443/udp"]
   data:
+    networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
     volumes: ["/mnt/share/petric:/srv:ro", "./filebrowser/petric.db:/database.db"]
     user: "1005:1005"
     command: [--noauth, -d=/database.db, -b=/data, -l=stdout]
   data-wip:
+    networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
     volumes: ["/mnt/share/petric-wip:/srv", "./filebrowser/petric-wip.db:/database.db"]
     user: "1005:1005"
     command: [--noauth, -d=/database.db, -b=/data-wip, -l=stdout]
+networks: {reverse_proxy: {external: true}}

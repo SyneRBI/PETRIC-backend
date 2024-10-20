@@ -14,14 +14,3 @@ RUN pip install --no-cache-dir git+https://github.com/TomographicImaging/Hackath
 FROM continuumio/miniconda3:latest AS leaderboard
 RUN conda install -y tensorboard && conda clean -afy
 RUN pip install tensorboard-plugin-3d
-
-FROM caddy:2.8.4-builder-alpine AS builder
-RUN xcaddy build \
-  --with github.com/mholt/caddy-webdav
-FROM wemakeservices/caddy-gen:1.0.0 AS caddy-gen
-COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-ARG CADDY_UID=0
-ARG CADDY_GID=0
-RUN chown -R $CADDY_UID:$CADDY_GID /code/docker-gen/templates/Caddyfile.tmpl /etc/caddy /config/caddy
-RUN chmod a+x /usr/bin/forego
-USER $CADDY_UID:$CADDY_GID
