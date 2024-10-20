@@ -28,7 +28,7 @@ def valid(tensorboard_logfile: PurePath) -> bool:
     return len({"RMSE_whole_object", "RMSE_background"}.intersection(ea.Tags()['scalars'])) == 2
 
 
-def pass_time(tensorboard_logfile: PurePath) -> float:
+def pass_time(tensorboard_logfile: PurePath, default=2 * 60 * 60) -> float:
     """time at which thresholds were met (minus any metrics calculation time offset)"""
     ea = EventAccumulator(str(tensorboard_logfile), size_guidance={SCALARS: 0})
     ea.Reload()
@@ -56,8 +56,9 @@ def pass_time(tensorboard_logfile: PurePath) -> float:
     try:
         i = QualityMetrics.pass_index(metrics[0], thresholds)
     except IndexError:
-        return np.inf
-    return metrics[1][i] - (start or metrics[1][0])
+        # add distance away from threshold to default time
+        return default + (metrics[0, -1] - thresholds).sum()
+    return metrics[1, i] - (start or metrics[1, 0])
 
 
 if __name__ == '__main__':
@@ -75,8 +76,7 @@ if __name__ == '__main__':
                     if not valid(logfile):
                         log.warning("rm %s", logfile)
                         # logfile.unlink()
-                times = [
-                    pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
+                times = [pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
                 t = np.median(times) if times else np.inf
                 timings[dataset.name].append((t, f"{team.name}/{algo.name}"))
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
                 rank += 1
             print(f"- {_rank}: {algo_name}")
             ranks[algo_name] += _rank
-        print("\n")
+        print("")
 
     print("## Leaderboard")
     for algo_name, _ in sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]):
