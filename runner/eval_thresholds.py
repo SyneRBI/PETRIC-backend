@@ -10,6 +10,8 @@ from tqdm import tqdm
 from petric import QualityMetrics
 
 log = logging.getLogger(Path(__file__).stem)
+DATASET_WHITELIST = {'NeuroLF_Esser', 'Vision600_Hoffman', 'Vision600_ZrNEMA', 'D690_NEMA', 'Mediso_NEMA_lowcounts'}
+TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
 LOGDIR = Path("/o/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
 assert set(QualityMetrics.THRESHOLD.keys()) == TAGS
@@ -45,6 +47,9 @@ def pass_time(tensorboard_logfile: PurePath) -> float:
         start = start.wall_time
 
     tag_names: set[str] = {tag for tag in ea.Tags()['scalars'] if any(tag.startswith(i) for i in TAGS)}
+    if (skip := TAG_BLACKLIST & tag_names):
+        log.warning("skipping tags: %s", skip)
+        tag_names -= skip
     tags = {tag: scalars(ea, tag) for tag in tag_names}
 
     metrics = [tags.pop("RMSE_whole_object"), tags.pop("RMSE_background")]
@@ -73,6 +78,8 @@ if __name__ == '__main__':
             continue
         for algo in team.glob("*/"):
             for dataset in algo.glob("*/"):
+                if dataset.name not in DATASET_WHITELIST:
+                    continue
                 for logfile in dataset.glob("events.out.tfevents.*"):
                     if not valid(logfile):
                         log.warning("rm %s", logfile)
