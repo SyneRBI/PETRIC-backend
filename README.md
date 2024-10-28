@@ -4,7 +4,7 @@ Internal support for [SyneRBI/PETRIC](https://github.com/SyneRBI/PETRIC).
 
 The machine `tomography.stfc.ac.uk` runs two separate (technically independent) things I couldn't be bothered to put into different repos.
 
-## GitHub Actions CI self-hosted runner
+## 1. GitHub Actions CI self-hosted runner
 
 This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 
@@ -16,7 +16,7 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 > [!TIP]
 > [`petric.py`](https://github.com/SyneRBI/PETRIC/blob/main/petric.py) runs `main.Submission` with callbacks writing TensorBoard logs to `/opt/runner/logs/TEAM/VERSION`.
 
-## Webserver
+## 2. Webserver
 
 Created by `docker compose up -d`.
 
@@ -42,8 +42,16 @@ A horizontal line in the leaderboard graphs.
 > [!TIP]
 > [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip) needs authentication (username & password)
 
-## Ranking
+## 3. Utils
+
+### Ranking
 
 Computes submission rankings based on TensorBoard logs.
 
 - Sources: [`rank`](./rank)
+
+### Manual runner loop
+
+Runs all submitted algorithms on all data.
+
+- Sources: [`loop`](./loop)
