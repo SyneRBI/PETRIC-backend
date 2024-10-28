@@ -24,7 +24,7 @@ for sub in "${submissions[@]}" ; do
   sudo chgrp -Rc runner PETRIC
   sudo chmod -Rc g+w PETRIC
   docker run --rm --gpus all -u root --no-healthcheck -e GITHUB_REPOSITORY=SyneRBI/PETRIC-$team -e GITHUB_REF_NAME=$(git -C PETRIC describe --tags) \
-    -e TQDM_MININTERVAL=1 -e TQDM_DISCORD_TOKEN -e TQDM_DISCORD_CHANNEL_ID \
+    -e TQDM_MININTERVAL=1 \
     -e NUMEXPR_MAX_THREADS=24 \
     -e RUNNER_GID=$(getent group runner | cut -d: -f3) \
     -v /mnt/share:/mnt/share:ro \
@@ -32,4 +32,5 @@ for sub in "${submissions[@]}" ; do
     -v .:/w:rw -w /w \
     synerbi/sirf:ci \
     /w/run-main.sh
+  git -C PETRIC restore .
 done

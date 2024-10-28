@@ -9,7 +9,8 @@ from tqdm import tqdm
 from petric import QualityMetrics
 
 log = logging.getLogger(Path(__file__).stem)
-DATASET_WHITELIST = {'NeuroLF_Esser', 'Vision600_Hoffman', 'Vision600_ZrNEMA', 'D690_NEMA', 'Mediso_NEMA_lowcounts', 'DMI4_NEMA'}
+DATASET_WHITELIST = {
+    'NeuroLF_Esser', 'Vision600_Hoffman', 'Vision600_ZrNEMA', 'D690_NEMA', 'Mediso_NEMA_lowcounts', 'DMI4_NEMA'}
 TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
 LOGDIR = Path("/o/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}

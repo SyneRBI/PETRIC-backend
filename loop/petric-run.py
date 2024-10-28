@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-os.environ['PETRIC_SKIP_DATA'] = True
+os.environ['PETRIC_SKIP_DATA'] = '1'
 
 from petric import DATA_SLICES, OUTDIR, SRCDIR, Algorithm, MetricsWithTimeout, QualityMetrics, get_data, logging, np
 
@@ -22,10 +22,8 @@ data_dirs_metrics = [
 if __name__ == "__main__":
     from traceback import print_exc
 
-    from docopt import docopt
     from tqdm.contrib.logging import logging_redirect_tqdm
-    args = docopt(__doc__)
-    logging.basicConfig(level=getattr(logging, args["--log"].upper()))
+    logging.basicConfig(level=logging.INFO)
     redir = logging_redirect_tqdm()
     redir.__enter__()
     from main import Submission, submission_callbacks
