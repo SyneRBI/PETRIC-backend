@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-import os
-
-os.environ['PETRIC_SKIP_DATA'] = '1'
-
 from petric import DATA_SLICES, OUTDIR, SRCDIR, Algorithm, MetricsWithTimeout, QualityMetrics, get_data, logging, np
 
 data_dirs_metrics = [
