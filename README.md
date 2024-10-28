@@ -14,20 +14,24 @@ This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 - Usage: [PETRIC:.github/workflows/run.yml](https://github.com/SyneRBI/PETRIC/blob/main/.github/workflows/run.yml)`:jobs.full`
 
 > [!TIP]
-> [`petric.py`](https://github.com/SyneRBI/PETRIC/blob/main/petric.py) runs `main.Submission` with callbacks writing tensorboard logs to `/opt/runner/logs/TEAM/VERSION`.
-
-<!-- <br/> -->
-
-> [!NOTE]
-> [`thresholds.py`](./runner/thresholds.py) generates hardcoded tensorboard logs in `/opt/runner/logs/0_THRESHOLDS`.
+> [`petric.py`](https://github.com/SyneRBI/PETRIC/blob/main/petric.py) runs `main.Submission` with callbacks writing TensorBoard logs to `/opt/runner/logs/TEAM/VERSION`.
 
 ## Webserver
+
+Created by `docker compose up -d`.
 
 ### Leaderboard
 
 - Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard`
 - Exposes: `/opt/runner/logs`
 - Result: <https://petric.tomography.stfc.ac.uk/leaderboard>
+
+#### Thresholds
+
+A horizontal line in the leaderboard graphs.
+
+- Sources: [`thresholds`](./thresholds)
+- Exposes: `/opt/runner/logs/0_THRESHOLDS`
 
 ### Files
 

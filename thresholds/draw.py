@@ -1,4 +1,3 @@
-#!docker run --rm --user root -v /mnt/share:/mnt/share:ro -v /opt/runner:/o:rw synerbi/sirf:ci python
 from pathlib import Path
 from time import time
 
