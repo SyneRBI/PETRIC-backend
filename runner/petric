@@ -3,7 +3,7 @@ set -euo pipefail
 
 chgrp -Rc $GROUPS .
 chmod -Rc g+w .
-docker run --rm --gpus all --user root --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
+docker run --rm --gpus all -u root --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
   -e TQDM_MININTERVAL=1 \
   -e NUMEXPR_MAX_THREADS=24 \
   -e RUNNER_GID=$GROUPS \
