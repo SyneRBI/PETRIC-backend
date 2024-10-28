@@ -1,4 +1,3 @@
-#!docker run --rm --user root -v /opt/runner:/o:ro synerbi/sirf:ci python
 import logging
 from collections import defaultdict
 from pathlib import Path, PurePath

@@ -41,3 +41,9 @@ A horizontal line in the leaderboard graphs.
 
 > [!TIP]
 > [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip) needs authentication (username & password)
+
+## Ranking
+
+Computes submission rankings based on TensorBoard logs.
+
+- Sources: [`rank`](./rank)
