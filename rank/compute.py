@@ -45,14 +45,14 @@ def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
     ea.Reload()
 
     try:
-        start = ea.Scalars("reset")[0]
+        start_scalar = ea.Scalars("reset")[0]
     except KeyError:
         log.error("KeyError: reset: not using accurate relative time for %s", tensorboard_logfile.relative_to(LOGDIR))
-        start = None
+        start = 0.0
     else:
-        assert start.value == 0
-        assert start.step == -1
-        start = start.wall_time
+        assert start_scalar.value == 0
+        assert start_scalar.step == -1
+        start = start_scalar.wall_time
 
     tag_names: set[str] = {tag for tag in ea.Tags()['scalars'] if any(tag.startswith(i) for i in TAGS)}
     if (skip := TAG_BLACKLIST & tag_names):
@@ -60,7 +60,7 @@ def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
         tag_names -= skip
     tags = {tag: scalars(ea, tag) for tag in tag_names}
 
-    metrics = [tags.pop("RMSE_whole_object"), tags.pop("RMSE_background")]
+    metrics: np.ndarray = [tags.pop("RMSE_whole_object"), tags.pop("RMSE_background")]
     thresholds = [
         QualityMetrics.THRESHOLD["RMSE_whole_object"],
         QualityMetrics.THRESHOLD["RMSE_background"],] + [QualityMetrics.THRESHOLD["AEM_VOI"]] * len(tags)
