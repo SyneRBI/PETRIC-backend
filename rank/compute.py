@@ -18,6 +18,10 @@ TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
 assert set(QualityMetrics.THRESHOLD.keys()) == TAGS
 
 
+def fmt_time(seconds: float):
+    return "--:--" if np.isposinf(seconds) or np.isnan(seconds) else tqdm.format_interval(seconds)
+
+
 def scalars(ea: EventAccumulator, tag: str) -> list[tuple[float, float]]:
     """[(value, time), ...]"""
     steps = [s.step for s in ea.Scalars(tag)]
@@ -32,8 +36,11 @@ def valid(tensorboard_logfile: PurePath) -> bool:
     return len({"RMSE_whole_object", "RMSE_background"}.intersection(ea.Tags()['scalars'])) == 2
 
 
-def pass_time(tensorboard_logfile: PurePath) -> float:
-    """time at which thresholds were met (minus any metrics calculation time offset)"""
+def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
+    """
+    - time at which thresholds were met (minus any metrics calculation time offset).
+    - average distance above thresholds.
+    """
     ea = EventAccumulator(str(tensorboard_logfile), size_guidance={SCALARS: 0})
     ea.Reload()
 
@@ -60,12 +67,13 @@ def pass_time(tensorboard_logfile: PurePath) -> float:
     metrics.extend(tags.values())
     metrics = np.array(metrics).T # [(value, time), step, (RMSE, RMSE, VOI, ...)]
 
+    # average distance away from threshold
+    avg_dist_thresh = (metrics[0, -1] - thresholds).mean()
     try:
         i = QualityMetrics.pass_index(metrics[0], thresholds)
     except IndexError:
-        # add distance away from threshold to an arbitrarily large constant
-        return 1e5 + (metrics[0, -1] - thresholds).mean()
-    return metrics[1, i] - (start or metrics[1, 0])
+        return np.inf, avg_dist_thresh
+    return metrics[1, i] - (start or metrics[1, 0]), avg_dist_thresh
 
 
 if __name__ == '__main__':
@@ -78,8 +86,8 @@ if __name__ == '__main__':
         tee.write(" ".join(args) + "\n")
 
     logging.basicConfig(level=logging.INFO)
-    # {"dataset.name": [(time, "algo"), ...], ...}
-    timings: dict[str, list[tuple[float, str]]] = defaultdict(list)
+    # {"dataset.name": [((time, distance_above_thresh_avg, std_time), "algo"), ...], ...}
+    timings: dict[str, list[tuple[tuple[float, float, float], str]]] = defaultdict(list)
 
     # LOGDIR / "team" / "algo" / "dataset" / "events.out.tfevents.*"
     for team in LOGDIR.glob("*/"):
@@ -93,9 +101,15 @@ if __name__ == '__main__':
                     if not valid(logfile):
                         log.warning("rm %s", logfile)
                         # logfile.unlink()
-                times = [pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
-                t = (np.median(times), np.std(times, ddof=1)) if times else (np.inf, np.inf)
-                timings[dataset.name].append((t, f"{team.name}/{algo.name}"))
+                times_distances = [
+                    pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
+                # time, distance_above_thresh_avg, stdev_time
+                if times_distances:
+                    times, distances = [t for t, _ in times_distances], [d for _, d in times_distances]
+                    tds = np.median(times), np.mean(distances), np.std(times, ddof=1)
+                else:
+                    tds = np.inf, np.inf, np.inf
+                timings[dataset.name].append((tds, f"{team.name}/{algo.name}"))
 
     # insert `time=np.inf` for each team's missing algos
     algos = {algo_name for time_algos in timings.values() for _, algo_name in time_algos}
@@ -103,27 +117,27 @@ if __name__ == '__main__':
         missing = algos - {algo_name for _, algo_name in time_algos}
         for algo_name in missing:
             log.error("FileNotFoundError: logfile for %s/%s", algo_name, dataset_name)
-        time_algos.extend(((np.inf, np.inf), algo_name) for algo_name in missing)
+        time_algos.extend(((np.inf, np.inf, np.inf), algo_name) for algo_name in missing)
 
     # calculate ranks
     ranks: dict[str, int] = defaultdict(int)
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
         print_tee("##", dataset_name)
+        print_tee("Rank|Algorithm|Time|Time (stdev)|Avg > thresh")
+        print_tee("---:|---------|---:|-----------:|-----------:")
         N = len(time_algos)
         rank = 1
-        for (t, s), algo_name in time_algos:
+        for (t, d, s), algo_name in time_algos:
             if np.isposinf(t):
                 _rank = N
             else:
                 _rank = rank
                 rank += 1
-            print_tee(
-                f"- {_rank}: {algo_name}", f"({tqdm.format_interval(t)}±{tqdm.format_interval(s)})"
-                if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
+            print_tee(f"{_rank}|{algo_name}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name] += _rank
         print_tee("")
 
     print_tee("## Leaderboard")
-    for algo_name, _ in sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]):
-        print_tee("-", algo_name)
+    for i, (algo_name, _) in enumerate(sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]), start=1):
+        print_tee(f"{i}) {algo_name}")
