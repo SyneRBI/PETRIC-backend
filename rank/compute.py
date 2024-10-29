@@ -85,7 +85,7 @@ if __name__ == '__main__':
                         log.warning("rm %s", logfile)
                         # logfile.unlink()
                 times = [pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
-                t = np.median(times) if times else np.inf
+                t = (np.median(times), np.std(times, ddof=1)) if times else (np.inf, np.inf)
                 timings[dataset.name].append((t, f"{team.name}/{algo.name}"))
 
     # insert `time=np.inf` for each team's missing algos
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         missing = algos - {algo_name for _, algo_name in time_algos}
         for algo_name in missing:
             log.error("FileNotFoundError: logfile for %s/%s", algo_name, dataset_name)
-        time_algos.extend((np.inf, algo_name) for algo_name in missing)
+        time_algos.extend(((np.inf, np.inf), algo_name) for algo_name in missing)
 
     # calculate ranks
     ranks: dict[str, int] = defaultdict(int)
@@ -103,14 +103,14 @@ if __name__ == '__main__':
         print("##", dataset_name)
         N = len(time_algos)
         rank = 1
-        for t, algo_name in time_algos:
+        for (t, s), algo_name in time_algos:
             if np.isposinf(t):
                 _rank = N
             else:
                 _rank = rank
                 rank += 1
             print(f"- {_rank}: {algo_name}",
-                  f"({tqdm.format_interval(t)})" if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
+                  f"({tqdm.format_interval(t)}±{tqdm.format_interval(s)})" if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
             ranks[algo_name] += _rank
         print("")
 
