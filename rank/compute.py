@@ -22,6 +22,16 @@ def fmt_time(seconds: float):
     return "--:--" if np.isposinf(seconds) or np.isnan(seconds) else tqdm.format_interval(seconds)
 
 
+def repo(algo_name):
+    team, algo = algo_name.split("/", 1)
+
+    def slug(i):
+        return i.replace("-", "--").replace("_", "__")
+
+    return (f"[![{algo_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?style=social&logo=GitHub)]"
+            f"(https://github.com/SyneRBI/PETRIC-{team}/tree/{algo})")
+
+
 def scalars(ea: EventAccumulator, tag: str) -> list[tuple[float, float]]:
     """[(value, time), ...]"""
     steps = [s.step for s in ea.Scalars(tag)]
@@ -134,10 +144,10 @@ if __name__ == '__main__':
             else:
                 _rank = rank
                 rank += 1
-            print_tee(f"{_rank}|{algo_name}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
+            print_tee(f"{_rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name] += _rank
         print_tee("")
 
     print_tee("## Leaderboard")
     for i, (algo_name, _) in enumerate(sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]), start=1):
-        print_tee(f"{i}) {algo_name}")
+        print_tee(f"{i}) {repo(algo_name)}")
