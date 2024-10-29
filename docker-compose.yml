@@ -15,17 +15,18 @@ services:
     build: {context: ., target: leaderboard}
     restart: always
     expose: [6006]
-    command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /leaderboard"
+    command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /tensorboard"
     volumes: ["/opt/runner/logs:/logs"]
-    healthcheck: {test: "wget --spider localhost:6006/leaderboard"}
+    healthcheck: {test: "wget --spider localhost:6006/tensorboard"}
     labels:
       virtual.host: petric.tomography.stfc.ac.uk
       virtual.tls-email: casper.da-costa-luis@stfc.ac.uk
-      # /leaderboard -> leaderboard:6006
+      # /tensorboard -> leaderboard:6006/tensorboard
       virtual.port: 6006
-      virtual.proxy.matcher: /leaderboard*
+      virtual.proxy.matcher: /tensorboard*
       # /data -> caddy:/share/petric
       # /data-wip -> caddy:/share-rw/petric-wip
+      # /leaderboard -> caddy:/share/petric-wip/leaderboard.md
       # / -> wiki
       virtual.host.directives: |
         handle /data* {
@@ -36,6 +37,21 @@ services:
           reverse_proxy http://data-wip
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
+        handle_path /leaderboard* {
+          root * /share/petric-wip
+          handle / {
+            header Content-Type text/html
+            templates {
+              between "<<" ">>"
+            }
+            respond <<HTML
+            <!DOCTYPE html>
+            <html><head><title>PETRIC Leaderboard</title></head>
+            <body><<readFile "leaderboard.md" | markdown>></body></html>
+            HTML 200
+          }
+          file_server
+        }
   data:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
