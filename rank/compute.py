@@ -136,16 +136,9 @@ if __name__ == '__main__':
         print_tee("##", dataset_name)
         print_tee("Rank|Algorithm|Time|Time (stdev)|Avg > thresh")
         print_tee("---:|---------|---:|-----------:|-----------:")
-        N = len(time_algos)
-        rank = 1
-        for (t, d, s), algo_name in time_algos:
-            if np.isposinf(t):
-                _rank = N
-            else:
-                _rank = rank
-                rank += 1
-            print_tee(f"{_rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
-            ranks[algo_name] += _rank
+        for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
+            print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
+            ranks[algo_name] += rank
         print_tee("")
 
     print_tee("## Leaderboard")
