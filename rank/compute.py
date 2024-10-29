@@ -1,8 +1,8 @@
 import logging
 from collections import defaultdict
 from pathlib import Path, PurePath
-from time import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 from tensorboard.backend.event_processing.event_accumulator import SCALARS, EventAccumulator
 from tqdm import tqdm
@@ -87,7 +87,7 @@ def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
 
 
 if __name__ == '__main__':
-    tee_file = Path(f"ranks-{time()}.md")
+    tee_file = Path("/share/provisional.md")
     tee = tee_file.open("w")
     tee_file.chmod(0o664)
 
@@ -131,6 +131,7 @@ if __name__ == '__main__':
 
     # calculate ranks
     ranks: dict[str, int] = defaultdict(int)
+    avg_times: dict[str, list[float]] = defaultdict(list)
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
         print_tee("##", dataset_name)
@@ -139,8 +140,25 @@ if __name__ == '__main__':
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
             print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name] += rank
+            if not np.isposinf(t) and not np.isnan(t):
+                avg_times[algo_name].append(t)
         print_tee("")
 
     print_tee("## Leaderboard")
+    print_tee("![](ranks.jpg)")
     for i, (algo_name, _) in enumerate(sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]), start=1):
         print_tee(f"{i}) {repo(algo_name)}")
+
+    plt.figure(figsize=(6, 4), dpi=75)
+    plt.title("Average time to reach threshold")
+    labels = list(avg_times.keys())
+    y = [np.mean(avg_times[algo_name]) for algo_name in labels]
+    x = list(reversed(range(len(y))))
+    plt.barh(x, y, align='center')
+    ax = plt.gca()
+    plt.xlabel("Average Time, t/[s]")
+    ax.set_yticks(x, labels)
+    plt.tight_layout()
+    jpg = Path("/share/ranks.jpg")
+    plt.savefig(jpg)
+    jpg.chmod(0o664)
