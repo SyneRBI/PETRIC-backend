@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 from pathlib import Path, PurePath
+from time import time
 
 import numpy as np
 from tensorboard.backend.event_processing.event_accumulator import SCALARS, EventAccumulator
@@ -68,6 +69,14 @@ def pass_time(tensorboard_logfile: PurePath) -> float:
 
 
 if __name__ == '__main__':
+    tee_file = Path(f"ranks-{time()}.md")
+    tee = tee_file.open("w")
+    tee_file.chmod(0o664)
+
+    def print_tee(*args):
+        print(*args)
+        tee.write(" ".join(args) + "\n")
+
     logging.basicConfig(level=logging.INFO)
     # {"dataset.name": [(time, "algo"), ...], ...}
     timings: dict[str, list[tuple[float, str]]] = defaultdict(list)
@@ -100,7 +109,7 @@ if __name__ == '__main__':
     ranks: dict[str, int] = defaultdict(int)
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
-        print("##", dataset_name)
+        print_tee("##", dataset_name)
         N = len(time_algos)
         rank = 1
         for (t, s), algo_name in time_algos:
@@ -109,11 +118,12 @@ if __name__ == '__main__':
             else:
                 _rank = rank
                 rank += 1
-            print(f"- {_rank}: {algo_name}",
-                  f"({tqdm.format_interval(t)}±{tqdm.format_interval(s)})" if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
+            print_tee(
+                f"- {_rank}: {algo_name}", f"({tqdm.format_interval(t)}±{tqdm.format_interval(s)})"
+                if t < 3600 else f"(avg. {t-1e5:.2f} > thresh)")
             ranks[algo_name] += _rank
-        print("")
+        print_tee("")
 
-    print("## Leaderboard")
+    print_tee("## Leaderboard")
     for algo_name, _ in sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]):
-        print("-", algo_name)
+        print_tee("-", algo_name)
