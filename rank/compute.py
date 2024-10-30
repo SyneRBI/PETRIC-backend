@@ -129,36 +129,42 @@ if __name__ == '__main__':
             log.error("FileNotFoundError: logfile for %s/%s", algo_name, dataset_name)
         time_algos.extend(((np.inf, np.inf, np.inf), algo_name) for algo_name in missing)
 
+    print_tee("""For each [dataset](/data), each submitted algorithm is run multiple times.
+
+[Algorithms are ranked](https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds) by median time taken to reach the thresholds.
+
+If thresholds are not met, the fallback ranks by average distance above the thresholds.
+""")
+
     # calculate ranks
     ranks: dict[str, int] = defaultdict(int)
-    avg_times: dict[str, list[float]] = defaultdict(list)
+    scale_dist = 54321
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
         print_tee("##", dataset_name)
-        print_tee("Rank|Algorithm|Time|Time (stdev)|Avg > thresh")
-        print_tee("---:|:--------|---:|-----------:|-----------:")
+        print_tee("Rank|Algorithm|Time|Time (stdev)|Dist > thresh (avg)")
+        print_tee("---:|:--------|---:|-----------:|------------------:")
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
             print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name] += rank
-            if not np.isposinf(t) and not np.isnan(t):
-                avg_times[algo_name].append(t)
         print_tee("")
 
     print_tee("## Leaderboard")
-    print_tee("![](ranks.svg)\n")
-    print_tee("Fig 1: this excludes cases where thresholds were not met")
-    for i, (algo_name, _) in enumerate(sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]), start=1):
+    ranks = sorted(ranks.items(), key=lambda algo_rank: algo_rank[1])
+    for i, (algo_name, _) in enumerate(ranks, start=1):
         print_tee(f"{i}) {repo(algo_name)}")
 
+    print_tee("\n![](ranks.svg)\n")
     plt.figure(figsize=(6, 4), dpi=60)
     c = ['#f1f1f1', '#a8a8a8', '#ef6c00']
-    plt.title("Average time to reach threshold", color=c[0])
-    labels = sorted(avg_times.keys())
-    y = [np.mean(avg_times[algo_name]) for algo_name in labels]
+    plt.title("Figure 1: Average rank across all datasets", color=c[0])
+    labels = [algo_name for algo_name, _ in ranks]
+    y = [rank / len(timings) for _, rank in ranks]
     x = list(reversed(range(len(y))))
     plt.barh(x, y, align='center', color=c[2])
     ax = plt.gca()
-    ax.set_xlabel("Average Time, t/[s]", color=c[0])
+    ax.set_xlabel("Average Rank", color=c[0])
+    ax.set_xlim(1)
     ax.set_yticks(x, labels)
     ax.tick_params(colors=c[0])
     ax.tick_params(color=c[1])
