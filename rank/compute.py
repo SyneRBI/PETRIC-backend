@@ -96,7 +96,7 @@ if __name__ == '__main__':
         tee.write(" ".join(args) + "\n")
 
     logging.basicConfig(level=logging.INFO)
-    # {"dataset.name": [((time, distance_above_thresh_avg, std_time), "algo"), ...], ...}
+    # {"dataset.name": [((time, distance_above_thresh_avg, time_stderr), "algo"), ...], ...}
     timings: dict[str, list[tuple[tuple[float, float, float], str]]] = defaultdict(list)
 
     # LOGDIR / "team" / "algo" / "dataset" / "events.out.tfevents.*"
@@ -113,10 +113,10 @@ if __name__ == '__main__':
                         # logfile.unlink()
                 times_distances = [
                     pass_time(logfile) for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile)]
-                # time, distance_above_thresh_avg, stdev_time
+                # time, distance_above_thresh_avg, time_stderr
                 if times_distances:
                     times, distances = [t for t, _ in times_distances], [d for _, d in times_distances]
-                    tds = np.median(times), np.mean(distances), np.std(times, ddof=1)
+                    tds = np.median(times), np.mean(distances), np.std(times, ddof=1) / np.sqrt(len(times))
                 else:
                     tds = np.inf, np.inf, np.inf
                 timings[dataset.name].append((tds, f"{team.name}/{algo.name}"))
@@ -137,33 +137,34 @@ If thresholds are not met, the fallback ranks by average distance above the thre
 """)
 
     # calculate ranks
-    ranks: dict[str, int] = defaultdict(int)
+    ranks: dict[str, list[int]] = defaultdict(list)
     scale_dist = 54321
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
         print_tee("##", dataset_name)
-        print_tee("Rank|Algorithm|Time|Time (stdev)|Dist > thresh (avg)")
-        print_tee("---:|:--------|---:|-----------:|------------------:")
+        print_tee("Rank|Algorithm|Time|Time (stderr)|Dist > thresh (avg)")
+        print_tee("---:|:--------|---:|------------:|------------------:")
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
             print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
-            ranks[algo_name] += rank
+            ranks[algo_name].append(rank)
         print_tee("")
 
     print_tee("## Leaderboard")
-    ranks = sorted(ranks.items(), key=lambda algo_rank: algo_rank[1])
+    print_tee("\n![](ranks.svg)\n")
+    ranks = sorted(ranks.items(), key=lambda algo_rank: sum(algo_rank[1]))
     for i, (algo_name, _) in enumerate(ranks, start=1):
         print_tee(f"{i}) {repo(algo_name)}")
 
-    print_tee("\n![](ranks.svg)\n")
     plt.figure(figsize=(6, 4), dpi=60)
     c = ['#f1f1f1', '#a8a8a8', '#ef6c00']
     plt.title("Figure 1: Average rank across all datasets", color=c[0])
     labels = [algo_name for algo_name, _ in ranks]
-    y = [rank / len(timings) for _, rank in ranks]
-    x = list(reversed(range(len(y))))
-    plt.barh(x, y, align='center', color=c[2])
+    y = [np.mean(rank) for _, rank in ranks]
+    yerr = [np.std(rank, ddof=1) / np.sqrt(len(rank)) for _, rank in ranks]
+    x = range(len(y))
+    plt.barh(x, y, xerr=yerr, align='center', color=c[2])
     ax = plt.gca()
-    ax.set_xlabel("Average Rank", color=c[0])
+    ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
     ax.set_xlim(1)
     ax.set_yticks(x, labels)
     ax.tick_params(colors=c[0])
