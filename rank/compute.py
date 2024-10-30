@@ -136,7 +136,7 @@ if __name__ == '__main__':
         time_algos.sort()
         print_tee("##", dataset_name)
         print_tee("Rank|Algorithm|Time|Time (stdev)|Avg > thresh")
-        print_tee("---:|---------|---:|-----------:|-----------:")
+        print_tee("---:|:--------|---:|-----------:|-----------:")
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
             print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name] += rank
@@ -145,20 +145,25 @@ if __name__ == '__main__':
         print_tee("")
 
     print_tee("## Leaderboard")
-    print_tee("![](ranks.jpg)")
+    print_tee("![](ranks.svg)\n")
+    print_tee("Fig 1: this excludes cases where thresholds were not met")
     for i, (algo_name, _) in enumerate(sorted(ranks.items(), key=lambda algo_rank: algo_rank[1]), start=1):
         print_tee(f"{i}) {repo(algo_name)}")
 
-    plt.figure(figsize=(6, 4), dpi=75)
-    plt.title("Average time to reach threshold")
-    labels = list(avg_times.keys())
+    plt.figure(figsize=(6, 4), dpi=60)
+    c = ['#f1f1f1', '#a8a8a8', '#ef6c00']
+    plt.title("Average time to reach threshold", color=c[0])
+    labels = sorted(avg_times.keys())
     y = [np.mean(avg_times[algo_name]) for algo_name in labels]
     x = list(reversed(range(len(y))))
-    plt.barh(x, y, align='center')
+    plt.barh(x, y, align='center', color=c[2])
     ax = plt.gca()
-    plt.xlabel("Average Time, t/[s]")
+    ax.set_xlabel("Average Time, t/[s]", color=c[0])
     ax.set_yticks(x, labels)
+    ax.tick_params(colors=c[0])
+    ax.tick_params(color=c[1])
+    [ax.spines[s].set_color(c[1]) for s in ax.spines]
     plt.tight_layout()
-    jpg = Path("/share/ranks.jpg")
-    plt.savefig(jpg)
-    jpg.chmod(0o664)
+    img = Path("/share/ranks.svg")
+    plt.savefig(img, transparent=True)
+    img.chmod(0o664)
