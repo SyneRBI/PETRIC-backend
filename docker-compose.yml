@@ -37,6 +37,7 @@ services:
           reverse_proxy http://data-wip
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
+        redir /leaderboard /leaderboard/
         handle_path /leaderboard* {
           root * /share/petric-wip
           handle / {
