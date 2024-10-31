@@ -16,6 +16,15 @@ TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
 LOGDIR = Path("/o/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
 assert set(QualityMetrics.THRESHOLD.keys()) == TAGS
+LNAME = [
+    ("Siemens_Vision600_ZrNEMAIQ", "Vision600_ZrNEMA"),
+    ("NeuroLF_Esser_Dataset", "NeuroLF_Esser"),
+    ("Mediso_NEMA_IQ_lowcounts", "Mediso_NEMA_lowcounts"),
+    ("Siemens_Vision600_Hoffman", "Vision600_Hoffman"),
+    ("GE_D690_NEMA_IQ", "D690_NEMA"),
+    ("GE_DMI4_NEMA_IQ", "DMI4_NEMA"),
+]
+LNAME = {v:k for k,v in LNAME}
 
 
 def fmt_time(seconds: float):
@@ -141,13 +150,20 @@ If thresholds are not met, the fallback ranks by average distance above the thre
     scale_dist = 54321
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
-        print_tee("##", dataset_name)
+        print_tee(f"## [{dataset_name}](https://petric.tomography.stfc.ac.uk/data/{LNAME[dataset_name]})")
+        print_tee('<div class="row"><div class="column">\n')
         print_tee("Rank|Algorithm|Time|Time (stderr)|Dist > thresh (avg)")
         print_tee("---:|:--------|---:|------------:|------------------:")
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
             print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name].append(rank)
-        print_tee("")
+        print_tee(f"""
+</div><div class="column">Reference image slice<div class="imgContainer">
+
+![](https://petric.tomography.stfc.ac.uk/data-raw/{LNAME[dataset_name]}/PETRIC/reference_image_slices.png)
+
+</div></div></div>
+""")
 
     print_tee("## Leaderboard")
     print_tee("\n![](ranks.svg)\n")

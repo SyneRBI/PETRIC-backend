@@ -24,17 +24,22 @@ services:
       # /tensorboard -> leaderboard:6006/tensorboard
       virtual.port: 6006
       virtual.proxy.matcher: /tensorboard*
-      # /data -> caddy:/share/petric
-      # /data-wip -> caddy:/share-rw/petric-wip
+      # /data -> data:80
+      # /data-raw -> caddy:/share/petric
+      # /data-wip -> data-wip:80
       # /leaderboard -> caddy:/share/petric-wip/leaderboard.md
       # / -> wiki
       virtual.host.directives: |
-        handle /data* {
-          reverse_proxy http://data
-        }
         handle /data-wip* {
           import ext_auth
           reverse_proxy http://data-wip
+        }
+        handle_path /data-raw* {
+          root * /share/petric
+          file_server browse
+        }
+        handle /data* {
+          reverse_proxy http://data
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
         redir /leaderboard /leaderboard/
