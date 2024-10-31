@@ -31,14 +31,24 @@ def fmt_time(seconds: float):
     return "--:--" if np.isposinf(seconds) or np.isnan(seconds) else tqdm.format_interval(seconds)
 
 
-def repo(algo_name):
-    team, algo = algo_name.split("/", 1)
+def slug(repo_name):
+    """escape for use in shields.io badge labels"""
+    return str(repo_name).replace("-", "--").replace("_", "__")
 
-    def slug(i):
-        return i.replace("-", "--").replace("_", "__")
+
+def repo(algo_name):
+    """markdown link"""
+    team, algo = algo_name.split("/", 1)
 
     return (f"[![{algo_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?style=social&logo=GitHub)]"
             f"(https://github.com/SyneRBI/PETRIC-{team}/tree/{algo})")
+
+
+def tb_log(algo_name, dataset_name):
+    """markdown link"""
+    team, algo = algo_name.split("/", 1)
+
+    return f"[![{algo_name}/{dataset_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?logo=tensorflow)](https://petric.tomography.stfc.ac.uk/tensorboard/?pinnedCards=%5B%7B%22plugin%22%3A%22scalars%22%2C%22tag%22%3A%22RMSE_whole_object%22%7D%5D&runFilter={team}/{algo}/{dataset_name}%24%7CTHRESHOLD#timeseries)"
 
 
 def scalars(ea: EventAccumulator, tag: str) -> list[tuple[float, float]]:
@@ -138,10 +148,8 @@ if __name__ == '__main__':
             log.error("FileNotFoundError: logfile for %s/%s", algo_name, dataset_name)
         time_algos.extend(((np.inf, np.inf, np.inf), algo_name) for algo_name in missing)
 
-    print_tee("""For each [dataset](/data), each submitted algorithm is run multiple times.
-
-[Algorithms are ranked](https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds) by median time taken to reach the thresholds.
-
+    print_tee("""For each [dataset](/data), each submitted algorithm is run multiple times.\\
+[Algorithms are ranked](https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds) by median time taken to reach the thresholds.\\
 If thresholds are not met, the fallback ranks by average distance above the thresholds.
 """)
 
@@ -155,7 +163,7 @@ If thresholds are not met, the fallback ranks by average distance above the thre
         print_tee("Rank|Algorithm|Time|Time (stderr)|Dist > thresh (avg)")
         print_tee("---:|:--------|---:|------------:|------------------:")
         for rank, ((t, d, s), algo_name) in enumerate(time_algos, start=1):
-            print_tee(f"{rank}|{repo(algo_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
+            print_tee(f"{rank}|{tb_log(algo_name, dataset_name)}|{fmt_time(t)}|{fmt_time(s)}|{d:.2f}")
             ranks[algo_name].append(rank)
         print_tee(f"""
 </div><div class="column">Reference image slice<div class="imgContainer">
