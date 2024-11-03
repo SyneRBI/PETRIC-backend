@@ -24,4 +24,4 @@ perms:
 	sudo chown -RcH $(shell id -u):runner $(FILES)
 	sudo chmod -Rc $(PERM) $(FILES)
 compress:
-	cd /mnt/share/petric; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png"
+	cd /mnt/share/petric; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"

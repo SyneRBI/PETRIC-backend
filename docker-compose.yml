@@ -27,7 +27,7 @@ services:
       # /data -> data:80
       # /data-raw -> caddy:/share/petric
       # /data-wip -> data-wip:80
-      # /leaderboard -> caddy:/share/petric-wip/leaderboard.md
+      # /leaderboard -> caddy:/share/petric/leaderboard.md
       # / -> wiki
       virtual.host.directives: |
         handle /data-wip* {
@@ -43,8 +43,10 @@ services:
         }
         redir / https://github.com/SyneRBI/PETRIC/wiki
         redir /leaderboard /leaderboard/
+        redir /data/files/leaderboard* /leaderboard/
+        redir /provisional* /leaderboard/
         handle_path /leaderboard* {
-          root * /share/petric-wip
+          root * /share/petric
           handle / {
             header Content-Type text/html
             templates {
