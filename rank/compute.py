@@ -74,14 +74,12 @@ def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
     ea.Reload()
 
     try:
-        start_scalar = ea.Scalars("reset")[0]
+        start_scalars = [i for i in ea.Scalars("reset") if i.value == 0 and i.step == -1]
     except KeyError:
         log.error("KeyError: reset: not using accurate relative time for %s", tensorboard_logfile.relative_to(LOGDIR))
         start = 0.0
     else:
-        assert start_scalar.value == 0
-        assert start_scalar.step == -1
-        start = start_scalar.wall_time
+        start = max(i.wall_time for i in start_scalars)
 
     tag_names: set[str] = {tag for tag in ea.Tags()['scalars'] if any(tag.startswith(i) for i in TAGS)}
     if (skip := TAG_BLACKLIST & tag_names):
