@@ -64,14 +64,14 @@ services:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
-    volumes: ["/mnt/share-public/petric:/srv:ro", "./filebrowser/petric.db:/database.db"]
-    user: "1005:1005"
-    command: [--noauth, -d=/database.db, -b=/data, -l=stdout]
+    volumes: ["/mnt/share-public/petric:/srv:ro"]
+    user: "1000:1005"
+    command: [--noauth, -b=/data, -l=stdout]
   data-wip:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
-    volumes: ["/mnt/share-public/petric-wip:/srv", "./filebrowser/petric-wip.db:/database.db"]
-    user: "1005:1005"
-    command: [--noauth, -d=/database.db, -b=/data-wip, -l=stdout]
+    volumes: ["/mnt/share-public/petric-wip:/srv"]
+    user: "1000:1005"
+    command: [--noauth, -b=/data-wip, -l=stdout]
 networks: {reverse_proxy: {external: true}}
