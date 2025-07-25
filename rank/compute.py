@@ -103,7 +103,60 @@ def pass_time(tensorboard_logfile: PurePath) -> tuple[float, float]:
     return metrics[1, i] - (start or metrics[1, 0]), avg_dist_thresh
 
 
-if __name__ == '__main__':
+def get_scalars(tensorboard_logfile: PurePath, tag: str) -> tuple[float, float]:
+    """[(value, time), ...]"""
+    ea = EventAccumulator(str(tensorboard_logfile), size_guidance={SCALARS: 0})
+    ea.Reload()
+
+    try:
+        start_scalars = [i for i in ea.Scalars("reset") if i.value == 0 and i.step == -1]
+    except KeyError:
+        log.error("KeyError: reset: not using accurate relative time for %s", tensorboard_logfile.relative_to(LOGDIR))
+        start = 0.0
+    else:
+        start = max(i.wall_time for i in start_scalars)
+
+    metrics = np.array(scalars(ea, tag))
+    metrics[:, 1] -= start or metrics[0, 1]
+    return metrics
+
+
+if __name__ == '__main__':  # hacky new plots
+    logging.basicConfig(level=logging.INFO)
+    import re
+    import matplotlib.ticker
+    # LOGDIR / "team" / "algo" / "dataset" / "events.out.tfevents.*"
+    for dataset_name, tag in [
+        ("DMI4_NEMA", "RMSE_whole_object"),
+        ("DMI4_NEMA", "AEM_VOI_sphere2"),
+        ("NeuroLF_Esser", "RMSE_whole_object"),
+        ###("NeuroLF_Esser", "AEM_VOI_chest_lesion"),
+        ("NeuroLF_Esser", "AEM_VOI_cold_cylinder"),
+        ("Vision600_ZrNEMA", "RMSE_whole_object"),
+        ("Vision600_ZrNEMA", "AEM_VOI_sphere2"),
+    ]:
+        plt.figure(figsize=(6, 4), dpi=60)
+        for team in sorted(LOGDIR.glob("*/")):
+            if team.name == '0_THRESHOLDS':
+                continue
+            for algo in sorted(team.glob("*/")):
+                dataset = algo / dataset_name
+                logfile = max(logfile for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile))
+                metrics = get_scalars(logfile, tag)
+                plt.semilogy(metrics[:, 1], metrics[:, 0], label=f"{team.name}/{algo.name}")
+                plt.gca().xaxis.set_ticks(np.arange(0, metrics[-1, 1] + 1, 600 if metrics[-1, 1] > 600 else 60))
+                plt.gca().set_xlim(0, metrics[-1, 1])
+                plt.gca().xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: tqdm.format_interval(x)))
+        plt.axhline(QualityMetrics.THRESHOLD.get(tag, QualityMetrics.THRESHOLD['AEM_VOI']), label="Threshold", color="black")
+        if (dataset_name, tag) == ("DMI4_NEMA", "RMSE_whole_object"):
+            plt.legend()
+        plt.tight_layout()
+        img = Path(f"/share/paper/{dataset_name}-{tag}.svg")
+        img.parent.mkdir(exist_ok=True)
+        plt.savefig(img, transparent=True)
+        img.chmod(0o664)
+
+else:  # OLD
     tee_file = Path("/share/provisional.md")
     tee = tee_file.open("w")
     tee_file.chmod(0o664)
