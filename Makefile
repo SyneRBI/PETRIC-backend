@@ -18,10 +18,10 @@ up:
 	docker compose logs petric
 	docker compose rm -f
 perms: PERM=ugo+rw
-perms: FILES=/mnt/share/petric /mnt/share/petric-wip
+perms: FILES=/mnt/share-public/petric /mnt/share-public/petric-wip
 perms:
 	sudo chown -Rc $(shell id -u):runner $(FILES)
 	sudo chown -RcH $(shell id -u):runner $(FILES)
 	sudo chmod -Rc $(PERM) $(FILES)
 compress:
-	cd /mnt/share/petric; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"
+	cd /mnt/share-public/petric; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"

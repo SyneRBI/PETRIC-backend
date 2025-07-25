@@ -7,7 +7,7 @@ docker run --rm --gpus all -u root --no-healthcheck -e GITHUB_REPOSITORY -e GITH
   -e TQDM_MININTERVAL=1 \
   -e NUMEXPR_MAX_THREADS=24 \
   -e RUNNER_GID=$GROUPS \
-  -v /mnt/share:/mnt/share:ro \
+  -v /mnt/share-public:/mnt/share:ro \
   -v /opt/runner:/o:rw \
   -v .:/w:rw -w /w \
   synerbi/sirf:ci \

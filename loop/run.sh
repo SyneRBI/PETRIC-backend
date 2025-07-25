@@ -27,7 +27,7 @@ for sub in "${submissions[@]}" ; do
     -e TQDM_MININTERVAL=1 \
     -e NUMEXPR_MAX_THREADS=24 \
     -e RUNNER_GID=$(getent group runner | cut -d: -f3) \
-    -v /mnt/share:/mnt/share:ro \
+    -v /mnt/share-public:/mnt/share:ro \
     -v /opt/runner:/o:rw \
     -v .:/w:rw -w /w \
     synerbi/sirf:ci \

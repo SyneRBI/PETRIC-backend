@@ -36,7 +36,7 @@ A horizontal line in the leaderboard graphs.
 ### Files
 
 - Sources: [`docker-compose.yml`](./docker-compose.yml)`:leaderboard.labels.virtual.host.directives,data,data-wip`
-- Exposes: `/mnt/share/petric`, `/mnt/share/petric-wip`
+- Exposes: `/mnt/share-public/petric`, `/mnt/share-public/petric-wip`
 - Result: <https://petric.tomography.stfc.ac.uk/data>, [/data-wip](https://petric.tomography.stfc.ac.uk/data-wip)
 
 > [!TIP]
