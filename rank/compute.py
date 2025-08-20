@@ -126,13 +126,18 @@ if __name__ == '__main__':  # plots for the paper
     import matplotlib.ticker
     # LOGDIR / "team" / "algo" / "dataset" / "events.out.tfevents.*"
     for dataset_name, tag in [
+        # Figure 5
         ("DMI4_NEMA", "RMSE_whole_object"),
         ("DMI4_NEMA", "AEM_VOI_sphere2"),
         ("NeuroLF_Esser", "RMSE_whole_object"),
-        ###("NeuroLF_Esser", "AEM_VOI_chest_lesion"),
         ("NeuroLF_Esser", "AEM_VOI_cold_cylinder"),
         ("Vision600_ZrNEMA", "RMSE_whole_object"),
         ("Vision600_ZrNEMA", "AEM_VOI_sphere2"),
+        # extra figure(s)
+        ("Vision600_Hoffman", "RMSE_whole_object"),
+        ("Vision600_Hoffman", "AEM_VOI_ventricles"),
+        ("Mediso_NEMA_lowcounts", "RMSE_whole_object"),
+        ("Mediso_NEMA_lowcounts", "AEM_VOI_2")
     ]:
         plt.figure(figsize=(6, 4), dpi=60)
         for team in sorted(LOGDIR.glob("*/")):
@@ -142,20 +147,41 @@ if __name__ == '__main__':  # plots for the paper
                 dataset = algo / dataset_name
                 logfile = max(logfile for logfile in dataset.glob("events.out.tfevents.*") if valid(logfile))
                 metrics = get_scalars(logfile, tag)
-                plt.semilogy(metrics[:, 1], metrics[:, 0], label=f"{team.name}/{algo.name}")
+                plt.semilogy(metrics[:, 1], metrics[:, 0], label=f"{team.name}/{algo.name}", ls={
+                    "MaGeZ": '-',
+                    "SOS": '--',
+                    "Tomo-Unimib": '-.',
+                    "UCL-EWS": ':'
+                }[team.name])
                 plt.gca().xaxis.set_ticks(np.arange(0, metrics[-1, 1] + 1, 600 if metrics[-1, 1] > 600 else 60))
                 plt.gca().set_xlim(0, metrics[-1, 1])
                 plt.gca().xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: tqdm.format_interval(x)))
         plt.axhline(QualityMetrics.THRESHOLD.get(tag, QualityMetrics.THRESHOLD['AEM_VOI']), label="Threshold", color="black")
-        if (dataset_name, tag) == ("DMI4_NEMA", "RMSE_whole_object"):
-            plt.legend()
+        match dataset_name, tag:
+            case "DMI4_NEMA", "RMSE_whole_object":
+                plt.gca().set_xlim(0, 30*60)
+            case "DMI4_NEMA", "AEM_VOI_sphere2":
+                plt.gca().set_xlim(0, 30*60)
+                plt.gca().set_ylim(1e-3, None)
+            case "NeuroLF_Esser", "AEM_VOI_cold_cylinder":
+                plt.gca().set_ylim(1e-3, None)
+            case "Vision600_ZrNEMA", "AEM_VOI_sphere2":
+                plt.gca().set_ylim(1e-3, None)
+                plt.legend(loc='upper right')
+            case "Mediso_NEMA_lowcounts", "RMSE_whole_object":
+                plt.gca().set_xlim(0, 20*60)
+            case "Mediso_NEMA_lowcounts", "AEM_VOI_2":
+                plt.gca().set_xlim(0, 20*60)
+                plt.gca().set_ylim(1e-3, None)
+            case "Vision600_Hoffman", "AEM_VOI_ventricles":
+                plt.gca().set_ylim(1e-3, None)
+
         plt.tight_layout()
         img = Path(f"/share/paper/{dataset_name}-{tag}.svg")
         img.parent.mkdir(exist_ok=True)
         plt.savefig(img, transparent=True)
         img.chmod(0o664)
-
-if __name__ == '__main__' and False:  # original
+else:  # original
     tee_file = Path("/share/provisional.md")
     tee = tee_file.open("w")
     tee_file.chmod(0o664)
