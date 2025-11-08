@@ -4,7 +4,7 @@ pushd /w/PETRIC
 
 source /o/petric-setup.sh
 
-curl -fsSL https://raw.githubusercontent.com/SyneRBI/PETRIC/main/petric.py > petric.py
+curl -fsSLO https://raw.githubusercontent.com/SyneRBI/PETRIC2/main/petric.py
 PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}" PETRIC_SKIP_DATA=1 python -B ../petric-run.py
 
 echo "stopping jobs"

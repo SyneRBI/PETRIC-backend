@@ -10,18 +10,20 @@ build:
 	echo building CI image
 	# docker pull synerbi/sirf:edge-gpu
 	docker compose build --pull
+	# docker push ghcr.io/synerbi/sirf:petric2
 up:
 	$(MAKE) -C thresholds
 	echo serving website
 	docker compose up -d
-	sleep 5
+	sleep 10
 	docker compose logs petric
 	docker compose rm -f
 perms: PERM=ugo+rw
-perms: FILES=/mnt/share-public/petric /mnt/share-public/petric-wip
+perms: FILES=/mnt/share-public/petric
 perms:
 	sudo chown -Rc $(shell id -u):runner $(FILES)
 	sudo chown -RcH $(shell id -u):runner $(FILES)
 	sudo chmod -Rc $(PERM) $(FILES)
 compress:
-	cd /mnt/share-public/petric; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"
+	cd /mnt/share-public/petric/1; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"
+	cd /mnt/share-public/petric/2; ls -d */ | sed s./.. | xargs -II zip -v -FS -r -o -9 I.zip I -x "*.png" -x "*.ipynb_checkpoints*"

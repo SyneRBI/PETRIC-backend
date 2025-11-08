@@ -13,7 +13,7 @@ log = logging.getLogger(Path(__file__).stem)
 DATASET_WHITELIST = {
     'NeuroLF_Esser', 'Vision600_Hoffman', 'Vision600_ZrNEMA', 'D690_NEMA', 'Mediso_NEMA_lowcounts', 'DMI4_NEMA'}
 TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
-LOGDIR = Path("/o/logs")
+LOGDIR = Path("/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
 assert set(QualityMetrics.THRESHOLD.keys()) == TAGS
 LNAME = [
@@ -41,7 +41,7 @@ def repo(algo_name):
     team, algo = algo_name.split("/", 1)
 
     return (f"[![{algo_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?style=social&logo=GitHub)]"
-            f"(https://github.com/SyneRBI/PETRIC-{team}/tree/{algo})")
+            f"(https://github.com/SyneRBI/PETRIC2-{team}/tree/{algo})")
 
 
 def tb_log(algo_name, dataset_name):
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         time_algos.extend(((np.inf, np.inf, np.inf), algo_name) for algo_name in missing)
 
     print_tee("""For each [dataset](/data), each submitted algorithm is run multiple times.\\
-[Algorithms are ranked](https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds) by median time taken to reach the thresholds.\\
+[Algorithms are ranked](https://github.com/SyneRBI/PETRIC2/wiki#metrics-and-thresholds) by median time taken to reach the thresholds.\\
 If thresholds are not met, the fallback ranks by average distance above the thresholds.
 """)
 

@@ -5,7 +5,7 @@ from tensorboardX import SummaryWriter
 
 from petric import QualityMetrics
 
-tb = SummaryWriter(logdir="/o/logs/0_THRESHOLDS")
+tb = SummaryWriter(logdir="/logs/0_THRESHOLDS")
 voi_names = {i.stem[4:] for i in Path("/mnt/share/petric").glob("*/PETRIC/VOI_*.hv")}
 t = int(time())
 

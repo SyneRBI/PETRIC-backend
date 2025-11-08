@@ -1,7 +1,7 @@
 services:
   petric:
     build: {context: ., target: sirf}
-    image: synerbi/sirf:ci
+    image: ghcr.io/synerbi/sirf:petric2
     # quick test of installed libraries
     deploy: {resources: {reservations: {devices: [{driver: nvidia, count: all, capabilities: [gpu]}]}}}
     command:
@@ -13,10 +13,11 @@ services:
   leaderboard:
     networks: [reverse_proxy]
     build: {context: ., target: leaderboard}
+    image: synerbi/tensorboard:latest
     restart: always
     expose: [6006]
     command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /tensorboard"
-    volumes: ["/opt/runner/logs:/logs"]
+    volumes: ["/opt/runner/logs/1:/logs"]
     healthcheck: {test: "wget --spider localhost:6006/tensorboard"}
     labels:
       virtual.host: petric.tomography.stfc.ac.uk
@@ -25,9 +26,11 @@ services:
       virtual.port: 6006
       virtual.proxy.matcher: /tensorboard*
       # /data -> data:80
+      # /2/data -> data2:80
       # /data-raw -> caddy:/share/petric
       # /data-wip -> data-wip:80
       # /leaderboard -> caddy:/share/petric/leaderboard.md
+      # /2/leaderboard -> leaderboard2:6006
       # / -> wiki
       virtual.host.directives: |
         handle /data-wip* {
@@ -41,12 +44,18 @@ services:
         handle /data* {
           reverse_proxy http://data
         }
-        redir / https://github.com/SyneRBI/PETRIC/wiki
+        handle /2/data* {
+          reverse_proxy http://data2
+        }
+        handle /2/leaderboard* {
+          reverse_proxy http://leaderboard2:6006
+        }
+        redir / https://github.com/SyneRBI/PETRIC2/wiki
         redir /leaderboard /leaderboard/
         redir /data/files/leaderboard* /leaderboard/
         redir /provisional* /leaderboard/
         handle_path /leaderboard* {
-          root * /share/petric
+          root * /share/petric/1
           handle / {
             header Content-Type text/html
             templates {
@@ -60,18 +69,34 @@ services:
           }
           file_server
         }
+  leaderboard2:
+    networks: [reverse_proxy]
+    build: {context: ., target: leaderboard}
+    image: synerbi/tensorboard:latest
+    restart: always
+    expose: [6006]
+    command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /2/leaderboard"
+    volumes: ["/opt/runner/logs/2:/logs"]
+    healthcheck: {test: "wget --spider localhost:6006/2/leaderboard"}
   data:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
-    volumes: ["/mnt/share-public/petric:/srv:ro"]
-    user: "1000:1005"
+    volumes: ["/mnt/share-public/petric/1:/srv:ro"]
+    user: "1000:1005" # ubuntu:runner
     command: [--noauth, -b=/data, -l=stdout]
+  data2:
+    networks: [reverse_proxy]
+    image: filebrowser/filebrowser:latest
+    restart: always
+    volumes: ["/mnt/share-public/petric/2:/srv:ro"]
+    user: "1000:1005"
+    command: [--noauth, -b=/2/data, -l=stdout]
   data-wip:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest
     restart: always
-    volumes: ["/mnt/share-public/petric-wip:/srv"]
-    user: "1000:1005"
+    volumes: ["/mnt/share-public/petric/wip:/srv"]
+    user: "1000:1005" # ubuntu:runner
     command: [--noauth, -b=/data-wip, -l=stdout]
 networks: {reverse_proxy: {external: true}}
