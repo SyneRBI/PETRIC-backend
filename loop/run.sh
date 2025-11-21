@@ -20,6 +20,7 @@ for sub in "${submissions[@]}" ; do
   git -C PETRIC remote add $team git@github.com:SyneRBI/PETRIC2-$team || :
   git -C PETRIC checkout $tag || git fetch --tags $team
   git -C PETRIC checkout $tag
+  git -C PETRIC checkout origin/main -- petric.py
 
   sudo chgrp -Rc runner PETRIC
   sudo chmod -Rc g+w PETRIC
