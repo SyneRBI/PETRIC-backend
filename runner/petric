@@ -3,12 +3,14 @@ set -euo pipefail
 
 chgrp -Rc $GROUPS .
 chmod -Rc g+w .
+curl -fsSLO https://raw.githubusercontent.com/SyneRBI/PETRIC2/main/petric.py
 docker run --rm --gpus all -u root --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
   -e TQDM_MININTERVAL=1 \
   -e NUMEXPR_MAX_THREADS=24 \
   -e RUNNER_GID=$GROUPS \
-  -v /mnt/share-public:/mnt/share:ro \
-  -v /opt/runner:/o:rw \
+  -v /mnt/share-public/petric/2:/mnt/share/petric:ro \
+  -v /opt/runner:/o:ro \
+  -v /opt/runner/logs/2:/logs:rw \
   -v .:/w:rw -w /w \
-  synerbi/sirf:ci \
+  ghcr.io/synerbi/sirf:petric2 \
   /o/petric-main.sh
