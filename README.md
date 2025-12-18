@@ -8,7 +8,7 @@ The machine `tomography.stfc.ac.uk` runs two separate (technically independent) 
 
 This has [`runner/petric`](./runner/petric) installed on its `$PATH`
 
-- Runner: [`synerbi@stfc`](https://github.com/organizations/SyneRBI/settings/actions/runners/102)
+- Runner: [`tomography@stfc`](https://github.com/organizations/SyneRBI/settings/actions/runners)
   + Tags: `docker`, `cuda`
 - Sources: [`runner`](./runner), [`docker-compose.yml`](./docker-compose.yml)`:petric`, [`Dockerfile`](./Dockerfile)
 - Usage: [PETRIC2:.github/workflows/run.yml](https://github.com/SyneRBI/PETRIC2/blob/main/.github/workflows/run.yml)`:jobs.full`
