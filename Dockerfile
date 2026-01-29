@@ -1,5 +1,5 @@
-# pin to https://github.com/SyneRBI/SIRF-SuperBuild/commit/60ffabee4a98bf5697145d81d3bc3fa568251d6c
-FROM ghcr.io/synerbi/sirf@sha256:04e7cfabbdc1955e66998c127eaead5d62e2648157ad130112ad29689046123e AS sirf
+# pin to https://github.com/SyneRBI/SIRF-SuperBuild/commit/e6cc1ff906a184d866c4fe56c8cda79777d392de
+FROM ghcr.io/synerbi/sirf@sha256:f71bb06617e957eead917245d72a03069e6b39561d4f317dd01783f71540c541 AS sirf
 RUN conda install -y tensorboard tensorboardx jupytext && conda clean -afy
 RUN pip install --no-cache-dir git+https://github.com/Project-MONAI/MONAI@1.5.1 torch tensorflow[and-cuda]==2.20 --extra-index-url https://download.pytorch.org/whl/cu128
 RUN pip install --no-cache-dir git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
