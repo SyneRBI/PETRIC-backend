@@ -4,7 +4,7 @@ set -euo pipefail
 export NB_GID=$(getent group runner | cut -d: -f3)
 chgrp -Rc $NB_GID .
 chmod -Rc g+w .
-docker run --rm --gpus all -u root -e NB_GID --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
+docker run --rm --init --gpus all -u root -e NB_GID --no-healthcheck -e GITHUB_REPOSITORY -e GITHUB_REF_NAME \
   -e TQDM_MININTERVAL=1 \
   -e NUMEXPR_MAX_THREADS=24 \
   -v /mnt/share-public/petric/2:/mnt/share/petric:ro \
