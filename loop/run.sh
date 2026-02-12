@@ -19,7 +19,7 @@ for sub in "${submissions[@]}" ; do
   team=$(echo $sub | cut -d '@' -f1)
   tag=$(echo $sub | cut -d '@' -f2)
   git -C PETRIC remote add $team git@github.com:SyneRBI/PETRIC2-$team || :
-  git -C PETRIC checkout $tag || git -C PETRIC fetch --tags $team
+  git -C PETRIC fetch --tags $team $tag -f
   git -C PETRIC checkout $tag
 
   sudo chgrp -Rc $NB_GID PETRIC
