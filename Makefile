@@ -8,7 +8,7 @@ install:
 	sudo chmod -c a+rx /opt/runner/petric*
 build:
 	echo building CI image
-	# docker pull synerbi/sirf:edge-gpu
+	docker compose pull data
 	docker compose build --pull
 	# docker push ghcr.io/synerbi/sirf:petric2
 up:
