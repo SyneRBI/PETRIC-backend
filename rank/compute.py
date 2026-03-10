@@ -8,6 +8,7 @@ from tensorboard.backend.event_processing.event_accumulator import SCALARS, Even
 from tqdm import tqdm
 
 from petric import QualityMetrics
+from SIRF_data_preparation.dataset_settings import names as LNAME
 
 log = logging.getLogger(Path(__file__).stem)
 DATASET_WHITELIST = {
@@ -16,15 +17,6 @@ TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
 LOGDIR = Path("/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
 assert set(QualityMetrics.THRESHOLD.keys()) == TAGS
-LNAME = [
-    ("Siemens_Vision600_ZrNEMAIQ", "Vision600_ZrNEMA"),
-    ("NeuroLF_Esser_Dataset", "NeuroLF_Esser"),
-    ("Mediso_NEMA_IQ_lowcounts", "Mediso_NEMA_lowcounts"),
-    ("Siemens_Vision600_Hoffman", "Vision600_Hoffman"),
-    ("GE_D690_NEMA_IQ", "D690_NEMA"),
-    ("GE_DMI4_NEMA_IQ", "DMI4_NEMA"),
-]
-LNAME = {v:k for k,v in LNAME}
 
 
 def fmt_time(seconds: float):
@@ -48,7 +40,7 @@ def tb_log(algo_name, dataset_name):
     """markdown link"""
     team, algo = algo_name.split("/", 1)
 
-    return f"[![{algo_name}/{dataset_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?logo=tensorflow)](https://petric.tomography.stfc.ac.uk/tensorboard/?pinnedCards=%5B%7B%22plugin%22%3A%22scalars%22%2C%22tag%22%3A%22RMSE_whole_object%22%7D%5D&runFilter={team}/{algo}/{dataset_name}%24%7CTHRESHOLD#timeseries)"
+    return f"[![{algo_name}/{dataset_name}](https://img.shields.io/badge/{slug(team)}-{slug(algo)}-black?logo=tensorflow)](https://petric.tomography.stfc.ac.uk/2/tensorboard/?pinnedCards=%5B%7B%22plugin%22%3A%22scalars%22%2C%22tag%22%3A%22RMSE_whole_object%22%7D%5D&runFilter={team}/{algo}/{dataset_name}%24%7CTHRESHOLD#timeseries)"
 
 
 def scalars(ea: EventAccumulator, tag: str) -> list[tuple[float, float]]:
@@ -156,7 +148,7 @@ If thresholds are not met, the fallback ranks by average distance above the thre
     scale_dist = 54321
     for dataset_name, time_algos in timings.items():
         time_algos.sort()
-        print_tee(f"## [{dataset_name}](https://petric.tomography.stfc.ac.uk/data/{LNAME[dataset_name]})")
+        print_tee(f"## [{dataset_name}](https://petric.tomography.stfc.ac.uk/2/data/{LNAME[dataset_name]})")
         print_tee('<div class="row"><div class="column">\n')
         print_tee("Rank|Algorithm|Time|Time (stderr)|Dist > thresh (avg)")
         print_tee("---:|:--------|---:|------------:|------------------:")
@@ -166,7 +158,7 @@ If thresholds are not met, the fallback ranks by average distance above the thre
         print_tee(f"""
 </div><div class="column">Reference image slice<div class="imgContainer">
 
-![](https://petric.tomography.stfc.ac.uk/data-raw/{LNAME[dataset_name]}/PETRIC/reference_image_slices.png)
+![](https://petric.tomography.stfc.ac.uk/2/data-raw/{LNAME[dataset_name]}/PETRIC/reference_image_slices.png)
 
 </div></div></div>
 """)
