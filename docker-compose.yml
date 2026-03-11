@@ -29,8 +29,9 @@ services:
       # /2/data -> data2:80
       # /data-raw -> caddy:/share/petric
       # /data-wip -> data-wip:80
-      # /leaderboard -> caddy:/share/petric/leaderboard.md
-      # /2/leaderboard -> leaderboard2:6006
+      # /leaderboard -> caddy:/share/petric/1/leaderboard.md
+      # /2/leaderboard -> caddy:/share/petric/2/leaderboard.md
+      # /2/tensorboard -> leaderboard2:6006/2/tensorboard
       # / -> wiki
       virtual.host.directives: |
         handle /data-wip* {
@@ -47,13 +48,18 @@ services:
         handle /2/data* {
           reverse_proxy http://data2
         }
-        handle /2/leaderboard* {
+        handle /2/tensorboard* {
           reverse_proxy http://leaderboard2:6006
         }
         redir / https://github.com/SyneRBI/PETRIC2/wiki
         redir /leaderboard /leaderboard/
         redir /data/files/leaderboard* /leaderboard/
         redir /provisional* /leaderboard/
+        redir /data-wip /data-wip/
+        redir /data-raw /data-raw/
+        redir /data /data/
+        redir /2/data /2/data/
+        redir /2/leaderboard /2/leaderboard/
         handle_path /leaderboard* {
           root * /share/petric/1
           handle / {
@@ -69,15 +75,30 @@ services:
           }
           file_server
         }
+        handle_path /2/leaderboard* {
+          root * /share/petric/2
+          handle / {
+            header Content-Type text/html
+            templates {
+              between "<<" ">>"
+            }
+            respond <<HTML
+            <!DOCTYPE html>
+            <html><head><title>PETRIC2 Leaderboard</title></head>
+            <body><<readFile "leaderboard.md" | markdown>></body></html>
+            HTML 200
+          }
+          file_server
+        }
   leaderboard2:
     networks: [reverse_proxy]
     build: {context: ., target: leaderboard}
     image: synerbi/tensorboard:latest
     restart: always
     expose: [6006]
-    command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /2/leaderboard"
+    command: "tensorboard --logdir=/logs --bind_all --window_title='PETRIC Leaderboard' --path_prefix /2/tensorboard"
     volumes: ["/opt/runner/logs/2:/logs"]
-    healthcheck: {test: "wget --spider localhost:6006/2/leaderboard"}
+    healthcheck: {test: "wget --spider localhost:6006/2/tensorboard"}
   data:
     networks: [reverse_proxy]
     image: filebrowser/filebrowser:latest

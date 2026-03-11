@@ -14,7 +14,7 @@ if __name__ == "__main__":
     for src in DATA:
         settings = get_settings(src)
         out = settings.name
-        cbk = MetricsWithTimeout(outdir=OUTDIR / out, **settings.slices, vmax=settings.vmax)
+        cbk = MetricsWithTimeout(seconds=60 * 60, outdir=OUTDIR / out, **settings.slices, vmax=settings.vmax)
         data = get_data(srcdir=SRCDIR / src, outdir=OUTDIR / out)
         if data.reference_image is not None:
             cbk.callbacks.append(

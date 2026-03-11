@@ -8,11 +8,14 @@ from tensorboard.backend.event_processing.event_accumulator import SCALARS, Even
 from tqdm import tqdm
 
 from petric import QualityMetrics
-from SIRF_data_preparation.dataset_settings import names as LNAME
+from SIRF_data_preparation import dataset_settings
+
+LNAME = {v: k for k, v in dataset_settings.names.items()}
 
 log = logging.getLogger(Path(__file__).stem)
 DATASET_WHITELIST = {
-    'NeuroLF_Esser', 'Vision600_Hoffman', 'Vision600_ZrNEMA', 'D690_NEMA', 'Mediso_NEMA_lowcounts', 'DMI4_NEMA'}
+    'NeuroLF_Esser2', 'NeuroLF_Hoffman2', 'mMR_ACR2', 'DMI3_Torso2', 'DMI4_NEMA_IQ2',
+    'D690_NEMA2'}
 TAG_BLACKLIST = {"AEM_VOI_VOI_whole_object"}
 LOGDIR = Path("/logs")
 TAGS = {"RMSE_whole_object", "RMSE_background", "AEM_VOI"}
@@ -158,13 +161,13 @@ If thresholds are not met, the fallback ranks by average distance above the thre
         print_tee(f"""
 </div><div class="column">Reference image slice<div class="imgContainer">
 
-![](https://petric.tomography.stfc.ac.uk/2/data-raw/{LNAME[dataset_name]}/PETRIC/reference_image_slices.png)
+![](https://petric.tomography.stfc.ac.uk/data-raw/2/{LNAME[dataset_name]}/PETRIC/reference_image_slices.png)
 
 </div></div></div>
 """)
 
     print_tee("## Leaderboard")
-    print_tee("\n![](ranks.svg)\n")
+    print_tee("\n![](/data-raw/2/ranks.svg)\n")
     ranks = sorted(ranks.items(), key=lambda algo_rank: sum(algo_rank[1]))
     for i, (algo_name, _) in enumerate(ranks, start=1):
         print_tee(f"{i}) {repo(algo_name)}")
